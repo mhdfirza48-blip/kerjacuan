@@ -8,4 +8,4 @@ export const firebaseConfig = {
   measurementId: "G-WZ27QDDH6L"
 };
 
-export const ADMIN_UID = "GANTI_ADMIN_UID";
+export const ADMIN_UID = "Qd9ErsSnBnZzMFitjQsELzeid8T2";
