@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Saldo</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="header">
+  <div class="logo">KerjaCuan</div>
+</header>
+
+
+<main class="container">
+
+  <div class="card center">
+
+    <p class="subtitle">
+      Saldo kamu
+    </p>
+
+    <h1 id="saldo">
+      Rp 0
+    </h1>
+
+  </div>
+
+</main>
+
+
+<nav class="nav">
+
+  <a href="index.html"><span>⌂</span>Beranda</a>
+  <a href="job.html"><span>⇩</span>Job</a>
+  <a href="tugas.html"><span>☑</span>Tugas</a>
+  <a href="riwayat.html"><span>◷</span>Riwayat</a>
+  <a class="active" href="saldo.html"><span>▣</span>Saldo</a>
+  <a href="profil.html"><span>♙</span>Profil</a>
+
+</nav>
+
+
+<script type="module">
+
+import {
+  auth,
+  db,
+  onAuthStateChanged,
+  doc,
+  getDoc
+} from "./firebase.js";
+
+
+onAuthStateChanged(auth, async user => {
+
+  if (!user) {
+
+    location.href = "login.html";
+    return;
+
+  }
+
+
+  const snap =
+    await getDoc(
+      doc(db, "users", user.uid)
+    );
+
+
+  if (snap.exists()) {
+
+    document.getElementById("saldo")
+      .textContent =
+      "Rp " +
+      Number(snap.data().saldo || 0)
+        .toLocaleString("id-ID");
+
+  }
+
+});
+
+</script>
+
+</body>
+</html>
