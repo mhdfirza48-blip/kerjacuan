@@ -1,5 +1,115 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Daftar - KerjaCuan</title><link rel="stylesheet" href="styles.css"></head><body><div class="auth card"><div class="center"><div class="brand">KerjaCuan</div><p class="muted">Buat akun pekerja</p></div><label class="label">Nama</label><input id="name" class="input" placeholder="Nama kamu"><label class="label">Email</label><input id="email" class="input" type="email" placeholder="Email"><label class="label">Password</label><input id="password" class="input" type="password" minlength="6" placeholder="Minimal 6 karakter"><br><br><button id="register" class="btn" style="width:100%">Daftar</button><p id="msg"></p><p class="center muted">Sudah punya akun? <a href="login.html" style="color:#21c55d">Login</a></p></div><script type="module">
-import {auth,db,createUserWithEmailAndPassword,doc,setDoc} from "./firebase.js";
-const $=id=>document.getElementById(id);
-$("register").onclick=async()=>{try{const name=$("name").value.trim(),email=$("email").value.trim(),password=$("password").value;if(!name)throw Error("Nama wajib diisi.");const c=await createUserWithEmailAndPassword(auth,email,password);await setDoc(doc(db,"users",c.user.uid),{name,email,role:"worker",balance:0,createdAt:new Date().toISOString()});location.href="worker.html";}catch(e){$("msg").className="error";$("msg").textContent=e.message;}};
-</script></body></html>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Daftar - KerjaCuan</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<nav class="navbar">
+  <a href="index.html" class="logo">KerjaCuan</a>
+  <a href="login.html" class="nav-btn">Login</a>
+</nav>
+
+<main class="container">
+
+  <div class="card">
+
+    <h1 class="title">Buat Akun</h1>
+
+    <p class="muted">
+      Daftar sebagai worker.
+    </p>
+
+    <div id="error" class="error"></div>
+
+    <label>Nama</label>
+    <input id="name" type="text" placeholder="Nama kamu">
+
+    <label>Email</label>
+    <input id="email" type="email" placeholder="nama@email.com">
+
+    <label>Password</label>
+    <input id="password" type="password" placeholder="Minimal 6 karakter">
+
+    <button id="register" class="btn btn-primary">
+      Daftar
+    </button>
+
+    <p class="muted">
+      Sudah punya akun?
+      <a href="login.html" class="nav-btn">Login</a>
+    </p>
+
+  </div>
+
+</main>
+
+<script type="module">
+
+import {
+  auth,
+  db,
+  createUserWithEmailAndPassword,
+  setDoc,
+  doc
+} from "./firebase.js";
+
+const errorBox = document.getElementById("error");
+
+document.getElementById("register").onclick = async () => {
+
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  errorBox.textContent = "";
+
+  if (!name || !email || !password) {
+    errorBox.textContent = "Semua kolom wajib diisi.";
+    return;
+  }
+
+  if (password.length < 6) {
+    errorBox.textContent = "Password minimal 6 karakter.";
+    return;
+  }
+
+  try {
+
+    const result =
+      await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+    await setDoc(
+      doc(db, "users", result.user.uid),
+      {
+        name: name,
+        email: email,
+        role: "worker",
+        balance: 0,
+        createdAt: new Date()
+      }
+    );
+
+    window.location.href = "worker.html";
+
+  } catch (error) {
+
+    errorBox.textContent =
+      error.message.replace("Firebase:", "").trim();
+
+  }
+
+};
+
+</script>
+
+</body>
+</html>
