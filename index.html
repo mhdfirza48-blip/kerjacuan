@@ -1,100 +1,188 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <title>KerjaCuan</title>
+  <title>Login - KerjaCuan</title>
 
   <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
 
     body {
-      margin: 0;
       min-height: 100vh;
-
-      font-family: Arial, sans-serif;
-
-      background: #0d1528;
-      color: white;
-
+      background: #0f172a;
       display: flex;
-      align-items: center;
       justify-content: center;
-
+      align-items: center;
       padding: 20px;
+      color: white;
     }
 
-    .box {
+    .login-box {
       width: 100%;
-      max-width: 600px;
+      max-width: 420px;
+      background: #1e293b;
+      padding: 32px;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    }
 
-      background: #1e2a40;
-
-      border-radius: 25px;
-
-      padding: 40px;
-
+    .logo {
       text-align: center;
+      font-size: 34px;
+      font-weight: bold;
+      color: #22c55e;
+      margin-bottom: 8px;
     }
 
-    h1 {
-      color: #20d05a;
-      font-size: 42px;
-    }
-
-    #name {
-      font-size: 25px;
-      margin: 20px 0;
-    }
-
-    #email {
-      color: #aebbd0;
+    .subtitle {
+      text-align: center;
+      color: #94a3b8;
       margin-bottom: 30px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #e2e8f0;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 18px;
+      border: 1px solid #475569;
+      border-radius: 10px;
+      background: #0f172a;
+      color: white;
+      font-size: 16px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #22c55e;
     }
 
     button {
       width: 100%;
-      height: 60px;
-
+      padding: 14px;
       border: none;
-      border-radius: 14px;
-
-      background: #c62828;
+      border-radius: 10px;
+      background: #22c55e;
       color: white;
-
-      font-size: 19px;
+      font-size: 16px;
       font-weight: bold;
+      cursor: pointer;
     }
 
+    button:disabled {
+      background: #64748b;
+      cursor: not-allowed;
+    }
+
+    .message {
+      display: none;
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .error {
+      background: #7f1d1d;
+      color: #fecaca;
+    }
+
+    .success {
+      background: #14532d;
+      color: #bbf7d0;
+    }
+
+    .register {
+      text-align: center;
+      margin-top: 20px;
+      color: #94a3b8;
+      font-size: 14px;
+    }
+
+    .register a {
+      color: #22c55e;
+      text-decoration: none;
+      font-weight: bold;
+    }
   </style>
-
 </head>
-
 
 <body>
 
+  <div class="login-box">
 
-  <div class="box">
-
-    <h1>
+    <div class="logo">
       KerjaCuan
-    </h1>
-
-    <div id="name">
-      Memuat...
     </div>
 
-    <div id="email"></div>
+    <div class="subtitle">
+      Masuk ke akun kamu
+    </div>
 
-    <button id="logout">
-      Logout
-    </button>
+    <form id="loginForm">
+
+      <label for="email">
+        Email
+      </label>
+
+      <input
+        type="email"
+        id="email"
+        placeholder="Masukkan email"
+        autocomplete="email"
+        required
+      >
+
+      <label for="password">
+        Password
+      </label>
+
+      <input
+        type="password"
+        id="password"
+        placeholder="Masukkan password"
+        autocomplete="current-password"
+        required
+      >
+
+      <button
+        type="submit"
+        id="loginButton"
+      >
+        Login
+      </button>
+
+    </form>
+
+    <div
+      id="errorBox"
+      class="message error"
+    ></div>
+
+    <div
+      id="successBox"
+      class="message success"
+    ></div>
+
+    <div class="register">
+      Belum punya akun?
+      <a href="daftar.html">Daftar</a>
+    </div>
 
   </div>
 
@@ -102,105 +190,360 @@
   <script type="module">
 
     import {
-
       auth,
-
+      signInWithEmailAndPassword,
       db,
-
-      onAuthStateChanged,
-
-      signOut,
-
       doc,
-
       getDoc
-
     } from "./firebase.js";
 
 
-    const nameElement =
-      document.getElementById("name");
+    const loginForm =
+      document.getElementById("loginForm");
 
-
-    const emailElement =
+    const emailInput =
       document.getElementById("email");
 
+    const passwordInput =
+      document.getElementById("password");
 
-    const logoutButton =
-      document.getElementById("logout");
+    const loginButton =
+      document.getElementById("loginButton");
+
+    const errorBox =
+      document.getElementById("errorBox");
+
+    const successBox =
+      document.getElementById("successBox");
 
 
-    onAuthStateChanged(
-      auth,
-      async (user) => {
+    function showError(text) {
+
+      errorBox.textContent = text;
+
+      errorBox.style.display = "block";
+
+      successBox.style.display = "none";
+    }
 
 
-        if (!user) {
+    function showSuccess(text) {
 
-          window.location.href =
-            "login.html";
+      successBox.textContent = text;
+
+      successBox.style.display = "block";
+
+      errorBox.style.display = "none";
+    }
+
+
+    function resetLoginButton() {
+
+      loginButton.disabled = false;
+
+      loginButton.textContent = "Login";
+    }
+
+
+    loginForm.addEventListener(
+      "submit",
+      async function(event) {
+
+        event.preventDefault();
+
+
+        const email =
+          emailInput.value.trim();
+
+        const password =
+          passwordInput.value;
+
+
+        errorBox.style.display = "none";
+
+        successBox.style.display = "none";
+
+
+        if (!email) {
+
+          showError(
+            "Email wajib diisi."
+          );
 
           return;
         }
 
 
-        emailElement.textContent =
-          user.email;
+        if (!password) {
+
+          showError(
+            "Password wajib diisi."
+          );
+
+          return;
+        }
+
+
+        loginButton.disabled = true;
+
+        loginButton.textContent =
+          "Memproses...";
 
 
         try {
 
-          const userDoc =
-            await getDoc(
-              doc(db, "users", user.uid)
+          /*
+           * LOGIN FIREBASE AUTH
+           */
+
+          const credential =
+            await signInWithEmailAndPassword(
+              auth,
+              email,
+              password
             );
 
 
-          if (userDoc.exists()) {
-
-            const data =
-              userDoc.data();
+          const user =
+            credential.user;
 
 
-            nameElement.textContent =
-              "Halo, " +
-              (data.name || "Pengguna");
+          /*
+           * CEK DATA USER DI FIRESTORE
+           */
 
-          } else {
+          const userRef =
+            doc(
+              db,
+              "users",
+              user.uid
+            );
 
-            nameElement.textContent =
-              "Halo, Pengguna";
 
+          const userSnapshot =
+            await getDoc(userRef);
+
+
+          /*
+           * JIKA DATA USER BELUM ADA
+           */
+
+          if (!userSnapshot.exists()) {
+
+            showError(
+              "Login berhasil, tetapi data pengguna belum ada di Firestore."
+            );
+
+            resetLoginButton();
+
+            return;
           }
+
+
+          const userData =
+            userSnapshot.data();
+
+
+          /*
+           * SIMPAN DATA LOGIN
+           */
+
+          localStorage.setItem(
+            "uid",
+            user.uid
+          );
+
+
+          localStorage.setItem(
+            "email",
+            user.email || ""
+          );
+
+
+          localStorage.setItem(
+            "role",
+            userData.role || "user"
+          );
+
+
+          /*
+           * LOGIN BERHASIL
+           */
+
+          showSuccess(
+            "Login berhasil. Mengarahkan..."
+          );
+
+
+          /*
+           * ADMIN
+           */
+
+          if (
+            userData.role === "admin"
+          ) {
+
+            setTimeout(() => {
+
+              window.location.href =
+                "admin.html";
+
+            }, 800);
+
+            return;
+          }
+
+
+          /*
+           * USER BIASA
+           */
+
+          setTimeout(() => {
+
+            window.location.href =
+              "index.html";
+
+          }, 800);
 
 
         } catch (error) {
 
-          console.error(error);
+          console.error(
+            "LOGIN ERROR:",
+            error
+          );
 
-          nameElement.textContent =
-            "Halo, Pengguna";
+
+          let message =
+            "Login gagal. Silakan coba lagi.";
+
+
+          /*
+           * EMAIL / PASSWORD SALAH
+           */
+
+          if (
+            error.code ===
+              "auth/invalid-credential" ||
+
+            error.code ===
+              "auth/wrong-password" ||
+
+            error.code ===
+              "auth/user-not-found"
+          ) {
+
+            message =
+              "Email atau password salah.";
+          }
+
+
+          /*
+           * API KEY
+           */
+
+          else if (
+            error.code ===
+            "auth/invalid-api-key"
+          ) {
+
+            message =
+              "API Key Firebase tidak valid.";
+          }
+
+
+          /*
+           * EMAIL TIDAK VALID
+           */
+
+          else if (
+            error.code ===
+            "auth/invalid-email"
+          ) {
+
+            message =
+              "Format email tidak valid.";
+          }
+
+
+          /*
+           * LOGIN EMAIL BELUM AKTIF
+           */
+
+          else if (
+            error.code ===
+            "auth/operation-not-allowed"
+          ) {
+
+            message =
+              "Login Email/Password belum diaktifkan di Firebase Authentication.";
+          }
+
+
+          /*
+           * TERLALU BANYAK PERCOBAAN
+           */
+
+          else if (
+            error.code ===
+            "auth/too-many-requests"
+          ) {
+
+            message =
+              "Terlalu banyak percobaan login. Coba lagi nanti.";
+          }
+
+
+          /*
+           * INTERNET
+           */
+
+          else if (
+            error.code ===
+            "auth/network-request-failed"
+          ) {
+
+            message =
+              "Koneksi internet bermasalah.";
+          }
+
+
+          /*
+           * ERROR LAIN
+           */
+
+          else if (error.message) {
+
+            message =
+              error.message;
+          }
+
+
+          /*
+           * TAMPILKAN ERROR
+           */
+
+          showError(message);
+
+
+          /*
+           * PENTING:
+           * TETAP DI HALAMAN LOGIN
+           * DAN BISA COBA LAGI
+           */
+
+          resetLoginButton();
+
+          passwordInput.value = "";
+
+          passwordInput.focus();
+
         }
-
-      }
-    );
-
-
-    logoutButton.addEventListener(
-      "click",
-      async () => {
-
-        await signOut(auth);
-
-        window.location.href =
-          "login.html";
 
       }
     );
 
   </script>
 
-
 </body>
-
 </html>
