@@ -2,114 +2,245 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Daftar - KerjaCuan</title>
-  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      color: #17233d;
+    }
+
+    header {
+      height: 90px;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 5%;
+      box-shadow: 0 2px 10px rgba(0,0,0,.06);
+    }
+
+    .logo {
+      font-size: 34px;
+      font-weight: 800;
+      color: #20bd59;
+    }
+
+    header a {
+      color: #1760c8;
+      font-size: 27px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    main {
+      padding: 60px 20px;
+    }
+
+    .card {
+      max-width: 630px;
+      margin: auto;
+      background: white;
+      padding: 60px 50px;
+      border-radius: 40px;
+      box-shadow: 0 12px 35px rgba(20,40,80,.08);
+    }
+
+    h1 {
+      font-size: 48px;
+      margin: 0 0 25px;
+    }
+
+    .subtitle {
+      color: #78869a;
+      font-size: 28px;
+      margin-bottom: 35px;
+    }
+
+    label {
+      display: block;
+      font-size: 25px;
+      font-weight: 700;
+      margin: 25px 0 10px;
+    }
+
+    input {
+      width: 100%;
+      padding: 22px;
+      border: 1px solid #dce2eb;
+      border-radius: 25px;
+      font-size: 22px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #20bd59;
+    }
+
+    button {
+      margin-top: 32px;
+      padding: 20px 38px;
+      border: 0;
+      border-radius: 22px;
+      background: #20bd59;
+      color: white;
+      font-size: 25px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: .6;
+    }
+
+    #message {
+      display: none;
+      margin: 20px 0;
+      padding: 15px;
+      border-radius: 15px;
+      font-size: 18px;
+    }
+
+    .login {
+      margin-top: 35px;
+      font-size: 24px;
+      color: #78869a;
+    }
+
+    .login a {
+      color: #1760c8;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    @media(max-width:600px) {
+      .logo {
+        font-size: 30px;
+      }
+
+      header a {
+        font-size: 22px;
+      }
+
+      .card {
+        padding: 40px 25px;
+        border-radius: 30px;
+      }
+
+      h1 {
+        font-size: 42px;
+      }
+
+      .subtitle {
+        font-size: 23px;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<nav class="navbar">
-  <a href="index.html" class="logo">KerjaCuan</a>
-  <a href="login.html" class="nav-btn">Login</a>
-</nav>
+<header>
+  <div class="logo">KerjaCuan</div>
+  <a href="./login.html">Login</a>
+</header>
 
-<main class="container">
-
+<main>
   <div class="card">
 
-    <h1 class="title">Buat Akun</h1>
+    <h1>Buat Akun</h1>
 
-    <p class="muted">
+    <div class="subtitle">
       Daftar sebagai worker.
-    </p>
+    </div>
 
-    <div id="error" class="error"></div>
+    <div id="message"></div>
 
-    <label>Nama</label>
-    <input id="name" type="text" placeholder="Nama kamu">
+    <form id="registerForm">
 
-    <label>Email</label>
-    <input id="email" type="email" placeholder="nama@email.com">
+      <label>Nama</label>
+      <input
+        id="name"
+        type="text"
+        placeholder="Masukkan nama"
+        required
+      >
 
-    <label>Password</label>
-    <input id="password" type="password" placeholder="Minimal 6 karakter">
+      <label>Email</label>
+      <input
+        id="email"
+        type="email"
+        placeholder="Masukkan email"
+        required
+      >
 
-    <button id="register" class="btn btn-primary">
-      Daftar
-    </button>
+      <label>Password</label>
+      <input
+        id="password"
+        type="password"
+        placeholder="Minimal 6 karakter"
+        minlength="6"
+        required
+      >
 
-    <p class="muted">
+      <button id="registerBtn" type="submit">
+        Daftar
+      </button>
+
+    </form>
+
+    <div class="login">
       Sudah punya akun?
-      <a href="login.html" class="nav-btn">Login</a>
-    </p>
+      <a href="./login.html">Login</a>
+    </div>
 
   </div>
-
 </main>
 
 <script type="module">
 
-import {
-  auth,
-  db,
-  createUserWithEmailAndPassword,
-  setDoc,
-  doc
-} from "./firebase.js";
+  import { auth, db } from "./firebase.js";
 
-const errorBox = document.getElementById("error");
+  import {
+    createUserWithEmailAndPassword
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-document.getElementById("register").onclick = async () => {
+  import {
+    doc,
+    setDoc,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  const name = document.getElementById("name").value.trim();
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
 
-  errorBox.textContent = "";
+  const form = document.getElementById("registerForm");
+  const message = document.getElementById("message");
+  const button = document.getElementById("registerBtn");
 
-  if (!name || !email || !password) {
-    errorBox.textContent = "Semua kolom wajib diisi.";
-    return;
+
+  function showMessage(text, error = true) {
+
+    message.style.display = "block";
+    message.textContent = text;
+
+    if (error) {
+      message.style.background = "#ffe8e8";
+      message.style.color = "#d93025";
+    } else {
+      message.style.background = "#e5f8ed";
+      message.style.color = "#16833a";
+    }
   }
 
-  if (password.length < 6) {
-    errorBox.textContent = "Password minimal 6 karakter.";
-    return;
-  }
 
-  try {
+  form.addEventListener("submit", async (e) => {
 
-    const result =
-      await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+    e.preventDefault();
 
-    await setDoc(
-      doc(db, "users", result.user.uid),
-      {
-        name: name,
-        email: email,
-        role: "worker",
-        balance: 0,
-        createdAt: new Date()
-      }
-    );
-
-    window.location.href = "worker.html";
-
-  } catch (error) {
-
-    errorBox.textContent =
-      error.message.replace("Firebase:", "").trim();
-
-  }
-
-};
-
-</script>
-
-</body>
-</html>
+   
