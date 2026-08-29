@@ -1,9 +1,206 @@
-const firebaseConfig = {
-  apiKey: "AIzaSyCIZtNC_dqyP19htXNcdf3TZSDwGZqla5c",
-  authDomain: "kerjacuan-374dd.firebaseapp.com",
-  projectId: "kerjacuan-374dd",
-  storageBucket: "kerjacuan-374dd.firebasestorage.app",
-  messagingSenderId: "677864393276",
-  appId: "1:677864393276:web:b6bd6852dc8ede6904d139",
-  measurementId: "G-WZ27QDDH6L"
-};
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>KerjaCuan</title>
+
+  <style>
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+
+      font-family: Arial, sans-serif;
+
+      background: #0d1528;
+      color: white;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      padding: 20px;
+    }
+
+    .box {
+      width: 100%;
+      max-width: 600px;
+
+      background: #1e2a40;
+
+      border-radius: 25px;
+
+      padding: 40px;
+
+      text-align: center;
+    }
+
+    h1 {
+      color: #20d05a;
+      font-size: 42px;
+    }
+
+    #name {
+      font-size: 25px;
+      margin: 20px 0;
+    }
+
+    #email {
+      color: #aebbd0;
+      margin-bottom: 30px;
+    }
+
+    button {
+      width: 100%;
+      height: 60px;
+
+      border: none;
+      border-radius: 14px;
+
+      background: #c62828;
+      color: white;
+
+      font-size: 19px;
+      font-weight: bold;
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+  <div class="box">
+
+    <h1>
+      KerjaCuan
+    </h1>
+
+    <div id="name">
+      Memuat...
+    </div>
+
+    <div id="email"></div>
+
+    <button id="logout">
+      Logout
+    </button>
+
+  </div>
+
+
+  <script type="module">
+
+    import {
+
+      auth,
+
+      db,
+
+      onAuthStateChanged,
+
+      signOut,
+
+      doc,
+
+      getDoc
+
+    } from "./firebase.js";
+
+
+    const nameElement =
+      document.getElementById("name");
+
+
+    const emailElement =
+      document.getElementById("email");
+
+
+    const logoutButton =
+      document.getElementById("logout");
+
+
+    onAuthStateChanged(
+      auth,
+      async (user) => {
+
+
+        if (!user) {
+
+          window.location.href =
+            "login.html";
+
+          return;
+        }
+
+
+        emailElement.textContent =
+          user.email;
+
+
+        try {
+
+          const userDoc =
+            await getDoc(
+              doc(db, "users", user.uid)
+            );
+
+
+          if (userDoc.exists()) {
+
+            const data =
+              userDoc.data();
+
+
+            nameElement.textContent =
+              "Halo, " +
+              (data.name || "Pengguna");
+
+          } else {
+
+            nameElement.textContent =
+              "Halo, Pengguna";
+
+          }
+
+
+        } catch (error) {
+
+          console.error(error);
+
+          nameElement.textContent =
+            "Halo, Pengguna";
+        }
+
+      }
+    );
+
+
+    logoutButton.addEventListener(
+      "click",
+      async () => {
+
+        await signOut(auth);
+
+        window.location.href =
+          "login.html";
+
+      }
+    );
+
+  </script>
+
+
+</body>
+
+</html>
