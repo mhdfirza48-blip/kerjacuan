@@ -1,476 +1,98 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KerjaCuan - Worker</title>
-
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f4f6fb;
-      color: #17213a;
-    }
-
-    header {
-      background: white;
-      padding: 20px 32px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 10px rgba(0,0,0,.05);
-    }
-
-    .logo {
-      font-size: 36px;
-      font-weight: 800;
-      color: #16b85a;
-    }
-
-    .logout {
-      border: 0;
-      background: #2875d0;
-      color: white;
-      padding: 16px 28px;
-      border-radius: 18px;
-      font-size: 18px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    main {
-      max-width: 900px;
-      margin: 45px auto;
-      padding: 0 20px;
-    }
-
-    .card {
-      background: white;
-      border-radius: 35px;
-      padding: 40px;
-      margin-bottom: 35px;
-      box-shadow: 0 5px 25px rgba(20,40,80,.06);
-    }
-
-    h1 {
-      font-size: 42px;
-      margin: 0 0 15px;
-    }
-
-    h2 {
-      font-size: 36px;
-      margin: 0 0 10px;
-    }
-
-    .muted {
-      color: #8190a5;
-      font-size: 25px;
-      margin-bottom: 25px;
-    }
-
-    .balance {
-      font-size: 58px;
-      font-weight: 800;
-      color: #16b85a;
-      margin-top: 10px;
-    }
-
-    #jobs {
-      display: grid;
-      gap: 20px;
-    }
-
-    .job {
-      border: 1px solid #e2e7ef;
-      border-radius: 22px;
-      padding: 25px;
-    }
-
-    .job h3 {
-      margin: 0 0 12px;
-      font-size: 27px;
-    }
-
-    .job p {
-      font-size: 18px;
-      line-height: 1.6;
-      color: #59677b;
-    }
-
-    .reward {
-      font-size: 24px;
-      font-weight: bold;
-      color: #16b85a;
-      margin: 18px 0;
-    }
-
-    .ambil {
-      border: 0;
-      background: #16b85a;
-      color: white;
-      padding: 13px 22px;
-      border-radius: 12px;
-      font-size: 17px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .loading {
-      text-align: center;
-      color: #8190a5;
-      font-size: 21px;
-      padding: 30px 0;
-    }
-
-    .error {
-      background: #fff0f0;
-      color: #d52f2f;
-      border-radius: 15px;
-      padding: 18px;
-      line-height: 1.5;
-    }
-
-    @media(max-width:600px) {
-      header {
-        padding: 18px 20px;
-      }
-
-      .logo {
-        font-size: 30px;
-      }
-
-      .logout {
-        padding: 12px 18px;
-        font-size: 16px;
-      }
-
-      main {
-        margin: 25px auto;
-      }
-
-      .card {
-        padding: 38px 28px;
-        border-radius: 32px;
-      }
-
-      h1 {
-        font-size: 34px;
-      }
-
-      h2 {
-        font-size: 32px;
-      }
-    }
-  </style>
-</head>
-
-<body>
-
-<header>
-  <div class="logo">KerjaCuan</div>
-  <button class="logout" id="logoutBtn">Keluar</button>
-</header>
-
-<main>
-
-  <section class="card">
-    <h1>Dashboard Worker</h1>
-    <div class="muted" id="userInfo">Memuat akun...</div>
-
-    <div>Saldo kamu</div>
-    <div class="balance" id="balance">Rp0</div>
-  </section>
-
-  <section>
-    <h2>Tugas Tersedia</h2>
-    <div class="muted">Pilih pekerjaan yang tersedia.</div>
-
-    <div id="jobs">
-      <div class="loading">Memuat tugas...</div>
-    </div>
-  </section>
-
-</main>
-
 <script type="module">
+async function loadJobs(user) {
 
-  import {
-    initializeApp
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  jobsBox.innerHTML = `
+    <div class="loading">Memuat tugas...</div>
+  `;
 
-  import {
-    getAuth,
-    onAuthStateChanged,
-    signOut
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  try {
 
-  import {
-    getFirestore,
-    collection,
-    getDocs,
-    query,
-    where,
-    doc,
-    getDoc,
-    addDoc,
-    serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    const jobsRef = collection(db, "jobs");
 
+    // Ambil semua dokumen dari koleksi jobs
+    const snapshot = await getDocs(jobsRef);
 
-  // =========================
-  // FIREBASE
-  // =========================
+    jobsBox.innerHTML = "";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyCIZtNC_dqyP19htXNcdf3TZSDwGZqla5c",
-    authDomain: "kerjacuan-374dd.firebaseapp.com",
-    projectId: "kerjacuan-374dd",
-    storageBucket: "kerjacuan-374dd.firebasestorage.app",
-    messagingSenderId: "677864393276",
-    appId: "1:677864393276:web:b6bd6852dc8ede6904d139",
-    measurementId: "G-WZ27QDDH6L"
-  };
-
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-
-
-  // =========================
-  // ELEMENT
-  // =========================
-
-  const userInfo = document.getElementById("userInfo");
-  const balance = document.getElementById("balance");
-  const jobsBox = document.getElementById("jobs");
-  const logoutBtn = document.getElementById("logoutBtn");
-
-
-  // =========================
-  // LOGOUT
-  // =========================
-
-  logoutBtn.onclick = async () => {
-    await signOut(auth);
-    location.href = "login.html";
-  };
-
-
-  // =========================
-  // AUTH
-  // =========================
-
-  onAuthStateChanged(auth, async (user) => {
-
-    if (!user) {
-      location.href = "login.html";
+    if (snapshot.empty) {
+      jobsBox.innerHTML = `
+        <div class="card">
+          <div class="loading">
+            Belum ada tugas tersedia.
+          </div>
+        </div>
+      `;
       return;
     }
 
-    try {
+    let jumlah = 0;
 
-      const userRef = doc(db, "users", user.uid);
-      const userSnap = await getDoc(userRef);
+    snapshot.forEach((jobDoc) => {
 
-      if (userSnap.exists()) {
+      const job = jobDoc.data();
 
-        const data = userSnap.data();
-
-        userInfo.textContent =
-          "Halo " + (data.name || user.email);
-
-        balance.textContent =
-          "Rp" + Number(data.balance || 0).toLocaleString("id-ID");
-
-      } else {
-
-        userInfo.textContent =
-          "Halo " + (user.email || "Worker");
-
-      }
-
-      await loadJobs(user);
-
-    } catch (error) {
-
-      console.error(error);
-
-      userInfo.textContent = "Halo " + user.email;
-
-      jobsBox.innerHTML = `
-        <div class="error">
-          Gagal memuat data akun.<br><br>
-          ${escapeHTML(error.message)}
-        </div>
-      `;
-    }
-
-  });
-
-
-  // =========================
-  // LOAD JOBS
-  // =========================
-
-  async function loadJobs(user) {
-
-    jobsBox.innerHTML =
-      `<div class="loading">Memuat tugas...</div>`;
-
-    try {
-
-      const jobsRef = collection(db, "jobs");
-
-      const q = query(
-        jobsRef,
-        where("status", "==", "active")
-      );
-
-      const snapshot = await getDocs(q);
-
-      jobsBox.innerHTML = "";
-
-      if (snapshot.empty) {
-
-        jobsBox.innerHTML = `
-          <div class="card">
-            <div class="loading">
-              Belum ada tugas tersedia.
-            </div>
-          </div>
-        `;
-
+      // Hanya tampilkan Job yang statusnya active
+      if (String(job.status || "").toLowerCase() !== "active") {
         return;
       }
 
+      jumlah++;
 
-      snapshot.forEach((jobDoc) => {
+      const title = job.title || "Tugas";
+      const description =
+        job.description || "Tidak ada deskripsi.";
 
-        const job = jobDoc.data();
+      const reward = Number(job.reward || 0);
 
-        const title =
-          job.title || "Tugas";
+      const div = document.createElement("div");
 
-        const description =
-          job.description || "Tidak ada deskripsi.";
+      div.className = "job";
 
-        const reward =
-          Number(job.reward || 0);
+      div.innerHTML = `
+        <h3>${escapeHTML(title)}</h3>
 
-        const div =
-          document.createElement("div");
+        <p>
+          ${escapeHTML(description)}
+        </p>
 
-        div.className = "job";
+        <div class="reward">
+          Reward:
+          Rp${reward.toLocaleString("id-ID")}
+        </div>
 
-        div.innerHTML = `
-          <h3>${escapeHTML(title)}</h3>
+        <button class="ambil">
+          Ambil Tugas
+        </button>
+      `;
 
-          <p>
-            ${escapeHTML(description)}
-          </p>
+      div.querySelector(".ambil").onclick = () => {
+        ambilTugas(jobDoc.id, job, user);
+      };
 
-          <div class="reward">
-            Reward: Rp${reward.toLocaleString("id-ID")}
-          </div>
+      jobsBox.appendChild(div);
+    });
 
-          <button class="ambil">
-            Ambil Tugas
-          </button>
-        `;
-
-        div.querySelector(".ambil").onclick =
-          () => ambilTugas(
-            jobDoc.id,
-            job,
-            user
-          );
-
-        jobsBox.appendChild(div);
-
-      });
-
-    } catch (error) {
-
-      console.error("LOAD JOB ERROR:", error);
-
+    if (jumlah === 0) {
       jobsBox.innerHTML = `
-        <div class="error">
-          <b>Gagal memuat tugas.</b><br><br>
-          ${escapeHTML(error.message)}
-          <br><br>
-          Pastikan koleksi <b>jobs</b> dan rules Firestore sudah benar.
+        <div class="card">
+          <div class="loading">
+            Belum ada tugas aktif.
+          </div>
         </div>
       `;
     }
+
+  } catch (error) {
+
+    console.error("ERROR JOB:", error);
+
+    jobsBox.innerHTML = `
+      <div class="error">
+        <b>Gagal memuat tugas.</b>
+        <br><br>
+        ${escapeHTML(error.message)}
+      </div>
+    `;
   }
-
-
-  // =========================
-  // AMBIL TUGAS
-  // =========================
-
-  async function ambilTugas(jobId, job, user) {
-
-    const ok = confirm(
-      "Ambil tugas \"" +
-      (job.title || "Tugas") +
-      "\"?"
-    );
-
-    if (!ok) return;
-
-    try {
-
-      await addDoc(
-        collection(db, "submissions"),
-        {
-          jobId: jobId,
-          workerId: user.uid,
-          workerEmail: user.email || "",
-          title: job.title || "",
-          reward: Number(job.reward || 0),
-          status: "pending",
-          createdAt: serverTimestamp()
-        }
-      );
-
-      alert(
-        "Tugas berhasil diambil. Silakan kerjakan sesuai instruksi."
-      );
-
-    } catch (error) {
-
-      console.error(error);
-
-      alert(
-        "Gagal mengambil tugas:\n" +
-        error.message
-      );
-    }
-  }
-
-
-  // =========================
-  // ESCAPE HTML
-  // =========================
-
-  function escapeHTML(value) {
-
-    return String(value)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-  }
-
+}
 </script>
-
-</body>
-</html>
