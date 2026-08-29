@@ -1,30 +1,17 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-
+// Firebase SDK
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
   getAuth,
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut
-} from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-
+  setPersistence,
+  browserLocalPersistence
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
-  getFirestore,
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  addDoc,
-  setDoc,
-  updateDoc,
-  query,
-  orderBy,
-  serverTimestamp,
-  runTransaction
-} from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+  getFirestore
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-onst firebaseConfig = {
-  apiKey: "AIzaSyCIZtNC_dqyP19htXNcdf3TZSDwGZqla5c",
+// Konfigurasi Firebase
+const firebaseConfig = {
+  apiKey: "PASTE_API_KEY_FIREBASE_KAMU",
   authDomain: "kerjacuan-374dd.firebaseapp.com",
   projectId: "kerjacuan-374dd",
   storageBucket: "kerjacuan-374dd.firebasestorage.app",
@@ -33,27 +20,22 @@ onst firebaseConfig = {
   measurementId: "G-WZ27QDDH6L"
 };
 
+// Init Firebase
 const app = initializeApp(firebaseConfig);
+
+// Authentication
 const auth = getAuth(app);
+
+setPersistence(auth, browserLocalPersistence).catch((error) => {
+  console.error("Persistence error:", error);
+});
+
+// Firestore
 const db = getFirestore(app);
 
+// Export
 export {
   app,
   auth,
-  db,
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut,
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  addDoc,
-  setDoc,
-  updateDoc,
-  query,
-  orderBy,
-  serverTimestamp,
-  runTransaction
+  db
 };
