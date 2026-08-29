@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tugas - KerjaCuan</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="header">
+
+  <div class="logo">
+    KerjaCuan
+  </div>
+
+</header>
+
+
+<main class="container">
+
+  <div class="card">
+
+    <h1 id="title">
+      Memuat...
+    </h1>
+
+    <p
+      id="description"
+      class="subtitle">
+    </p>
+
+    <div
+      id="reward"
+      class="reward">
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <h2>Kirim Hasil</h2>
+
+    <p class="subtitle">
+      Masukkan hasil pekerjaanmu di bawah.
+    </p>
+
+    <textarea
+      id="hasil"
+      placeholder="Masukkan hasil pekerjaan..."
+    ></textarea>
+
+    <button
+      class="btn"
+      id="submitBtn">
+      Kirim Hasil
+    </button>
+
+    <p id="message"></p>
+
+  </div>
+
+</main>
+
+
+<nav class="nav">
+
+  <a href="index.html">
+    <span>⌂</span>
+    Beranda
+  </a>
+
+  <a href="job.html">
+    <span>⇩</span>
+    Job
+  </a>
+
+  <a class="active" href="tugas.html">
+    <span>☑</span>
+    Tugas
+  </a>
+
+  <a href="riwayat.html">
+    <span>◷</span>
+    Riwayat
+  </a>
+
+  <a href="saldo.html">
+    <span>▣</span>
+    Saldo
+  </a>
+
+  <a href="profil.html">
+    <span>♙</span>
+    Profil
+  </a>
+
+</nav>
+
+
+<script type="module">
+
+import {
+  auth,
+  db,
+  onAuthStateChanged,
+  doc,
+  getDoc,
+  collection,
+  addDoc,
+  serverTimestamp
+} from "./firebase.js";
+
+
+let user;
+let job;
+
+
+const params =
+  new URLSearchParams(location.search);
+
+const jobId =
+  params.get("job");
+
+
+onAuthStateChanged(auth, async (u) => {
+
+  if (!u) {
+
+    location.href = "login.html";
+    return;
+
+  }
+
+  user = u;
+
+  if (!jobId) {
+
+    location.href = "job.html";
+    return;
+
+  }
+
+  await loadJob();
+
+});
+
+
+async function loadJob() {
+
+  const snap =
+    await getDoc(
+      doc(db, "jobs", jobId)
+    );
+
+
+  if (!snap.exists()) {
+
+    document.getElementById("title")
+      .textContent = "Job tidak ditemukan";
+
+    return;
+
+  }
+
+
+  job = snap.data();
+
+
+  document.getElementById("title")
+    .textContent = job.title;
+
+  document.getElementById("description")
+    .textContent = job.description;
+
+  document.getElementById("reward")
+    .textContent =
+    "Reward Rp " +
+    Number(job.reward || 0)
+      .toLocaleString("id-ID");
+
+}
+
+
+document
+  .getElementById("submitBtn")
+  .onclick = async () => {
+
+    const hasil =
+      document.getElementById("hasil")
+        .value.trim();
+
+
+    if (!hasil) {
+
+      alert("Masukkan hasil terlebih dahulu.");
+
+      return;
+
+    }
+
+
+    try {
+
+      await addDoc(
+        collection(db, "submissions"),
+        {
+
+          userId: user.uid,
+
+          userEmail: user.email,
+
+          jobId: jobId,
+
+          jobTitle: job.title,
+
+          reward: Number(job.reward || 0),
+
+          hasil: hasil,
+
+          status: "pending",
+
+          createdAt: serverTimestamp()
+
+        }
+      );
+
+
+      document.getElementById("hasil")
+        .value = "";
+
+
+      document.getElementById("message")
+        .textContent =
+        "✓ Hasil berhasil dikirim dan menunggu persetujuan admin.";
+
+
+      document.getElementById("message")
+        .style.color = "#159447";
+
+
+    } catch(error) {
+
+      alert(
+        "Gagal mengirim: " +
+        error.message
+      );
+
+    }
+
+  };
+
+</script>
+
+</body>
+</html>
