@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Worker - KerjaCuan</title>
 
   <style>
@@ -14,13 +13,13 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #f5f7fb;
-      color: #17233c;
+      background: #f4f6fb;
+      color: #14213d;
     }
 
     header {
       background: white;
-      padding: 20px 30px;
+      padding: 18px 5%;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -28,168 +27,124 @@
     }
 
     .logo {
+      color: #20b957;
       font-size: 32px;
       font-weight: 800;
-      color: #16b957;
     }
 
     .logout {
-      border: none;
-      background: #2468c9;
+      background: #ef2939;
       color: white;
-      padding: 12px 20px;
-      border-radius: 10px;
-      font-size: 16px;
+      border: 0;
+      padding: 16px 25px;
+      border-radius: 18px;
+      font-size: 18px;
       font-weight: bold;
-      cursor: pointer;
     }
 
     main {
-      max-width: 1000px;
-      margin: 35px auto;
-      padding: 0 20px;
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 0 18px;
     }
 
-    .welcome {
+    .card {
       background: white;
-      border-radius: 20px;
-      padding: 25px;
-      margin-bottom: 25px;
-      box-shadow: 0 5px 20px rgba(0,0,0,.06);
+      border-radius: 35px;
+      padding: 35px;
+      margin-bottom: 30px;
+      box-shadow: 0 8px 25px rgba(30,40,80,.07);
     }
 
-    .welcome h1 {
-      margin: 0 0 8px;
-      font-size: 28px;
+    h1 {
+      font-size: 40px;
+      margin: 0 0 25px;
     }
 
-    .welcome p {
-      margin: 0;
-      color: #718096;
-      font-size: 17px;
+    h2 {
+      font-size: 32px;
+      margin: 0 0 10px;
     }
 
-    .section-title {
-      font-size: 25px;
+    .muted {
+      color: #778399;
+      font-size: 22px;
+      line-height: 1.5;
+    }
+
+    .balance {
+      color: #20b957;
+      font-size: 52px;
       font-weight: 800;
-      margin: 25px 0 15px;
-    }
-
-    #jobs {
-      display: grid;
-      gap: 18px;
+      margin-top: 8px;
     }
 
     .job {
-      background: white;
-      border-radius: 18px;
+      border: 1px solid #e3e7ef;
+      border-radius: 22px;
       padding: 22px;
-      box-shadow: 0 5px 20px rgba(0,0,0,.06);
-      border: 1px solid #edf0f5;
+      margin-top: 18px;
     }
 
-    .job h2 {
+    .job h3 {
       margin: 0 0 10px;
-      font-size: 21px;
+      font-size: 25px;
     }
 
     .description {
       color: #667085;
-      line-height: 1.6;
-      margin-bottom: 15px;
-    }
-
-    .bottom {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 15px;
-      flex-wrap: wrap;
+      font-size: 17px;
+      line-height: 1.5;
     }
 
     .reward {
-      font-size: 20px;
-      font-weight: 800;
-      color: #16a34a;
-    }
-
-    .status {
-      display: inline-block;
-      background: #dcfce7;
-      color: #15803d;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 13px;
+      color: #20b957;
+      font-size: 24px;
       font-weight: bold;
-      margin-top: 8px;
+      margin: 15px 0;
     }
 
-    .work-btn {
-      border: none;
-      background: #20bf55;
+    .job button {
+      width: 100%;
+      border: 0;
+      background: #20b957;
       color: white;
-      padding: 12px 20px;
-      border-radius: 10px;
-      font-size: 16px;
+      padding: 15px;
+      border-radius: 14px;
+      font-size: 18px;
       font-weight: bold;
-      cursor: pointer;
     }
 
-    .work-btn:hover {
-      background: #16a34a;
+    .job button:disabled {
+      background: #aaa;
     }
 
     .empty {
-      background: white;
-      padding: 35px;
+      color: #778399;
+      font-size: 19px;
       text-align: center;
-      border-radius: 18px;
-      color: #718096;
-    }
-
-    .loading {
-      text-align: center;
-      padding: 30px;
-      color: #718096;
+      padding: 20px 0;
     }
 
     .error {
-      background: #fee2e2;
-      color: #b91c1c;
-      padding: 18px;
+      color: #d62828;
+      background: #fff0f0;
+      padding: 15px;
       border-radius: 12px;
       line-height: 1.5;
     }
 
-    @media (max-width: 600px) {
-      header {
-        padding: 16px 18px;
-      }
-
+    @media(max-width:600px) {
       .logo {
-        font-size: 27px;
+        font-size: 28px;
       }
 
-      main {
-        margin-top: 25px;
-        padding: 0 14px;
+      h1 {
+        font-size: 34px;
       }
 
-      .welcome h1 {
-        font-size: 24px;
-      }
-
-      .job {
-        padding: 18px;
-      }
-
-      .bottom {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      .work-btn {
-        width: 100%;
+      .card {
+        padding: 28px 22px;
       }
     }
   </style>
@@ -204,18 +159,34 @@
 
 <main>
 
-  <div class="welcome">
-    <h1>Dashboard Worker</h1>
-    <p id="userEmail">Memuat akun...</p>
+  <div class="card">
+    <h1>Halo 👋</h1>
+    <div id="name" class="muted">Memuat...</div>
+
+    <div style="margin-top:25px;font-size:20px;">
+      Saldo kamu
+    </div>
+
+    <div id="balance" class="balance">
+      Rp0
+    </div>
   </div>
 
-  <div class="section-title">
-    Tugas Tersedia
-  </div>
+  <div class="card">
+    <h1>Tugas</h1>
+    <div class="muted">
+      Pilih pekerjaan yang tersedia.
+    </div>
 
-  <div id="jobs">
-    <div class="loading">
+    <div id="jobs">
       Memuat tugas...
+    </div>
+  </div>
+
+  <div class="card">
+    <h1>Kiriman Saya</h1>
+    <div id="submissions" class="muted">
+      Memuat...
     </div>
   </div>
 
@@ -224,72 +195,28 @@
 <script type="module">
 
   import {
-    initializeApp
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    auth,
+    db
+  } from "./firebase.js";
 
   import {
-    getAuth,
     onAuthStateChanged,
     signOut
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
   import {
-    getFirestore,
     collection,
+    getDocs,
     query,
     where,
-    getDocs,
-    orderBy
+    doc,
+    getDoc,
+    addDoc,
+    serverTimestamp
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
-  // =========================
-  // FIREBASE CONFIG
-  // =========================
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyCIZtNC_dqyP19htXNcdf3TZSDwGZqla5c",
-    authDomain: "kerjacuan-374dd.firebaseapp.com",
-    projectId: "kerjacuan-374dd",
-    storageBucket: "kerjacuan-374dd.firebasestorage.app",
-    messagingSenderId: "677864393276",
-    appId: "1:677864393276:web:b6bd6852dc8ede6904d139",
-    measurementId: "G-WZ27QDDH6L"
-  };
-
-
-  // =========================
-  // INIT FIREBASE
-  // =========================
-
-  const app = initializeApp(firebaseConfig);
-
-  const auth = getAuth(app);
-
-  const db = getFirestore(app);
-
-
-  // =========================
-  // ELEMENT
-  // =========================
-
+  const nameBox = document.getElementById("name");
+  const balanceBox = document.getElementById("balance");
   const jobsBox = document.getElementById("jobs");
-  const userEmail = document.getElementById("userEmail");
-  const logout = document.getElementById("logout");
-
-
-  // =========================
-  // LOGOUT
-  // =========================
-
-  logout.addEventListener("click", async () => {
-
-    try {
-
-      await signOut(auth);
-
-      window.location.href = "login.html";
-
-    } catch (error) {
-
-     
+  const submissionsBox =
