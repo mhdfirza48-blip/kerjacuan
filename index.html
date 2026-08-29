@@ -1,288 +1,49 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KerjaCuan</title>
-
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
-
-    body {
-      background: #0f172a;
-      color: white;
-      min-height: 100vh;
-    }
-
-    .header {
-      background: #1e293b;
-      padding: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .logo {
-      color: #22c55e;
-      font-size: 28px;
-      font-weight: bold;
-    }
-
-    .logout {
-      background: #dc2626;
-      color: white;
-      border: none;
-      padding: 10px 18px;
-      border-radius: 8px;
-      font-size: 15px;
-    }
-
-    .container {
-      max-width: 700px;
-      margin: 30px auto;
-      padding: 20px;
-    }
-
-    .card {
-      background: #1e293b;
-      border-radius: 18px;
-      padding: 25px;
-      margin-bottom: 20px;
-    }
-
-    h1 {
-      margin-bottom: 10px;
-    }
-
-    .email {
-      color: #94a3b8;
-      margin-bottom: 20px;
-    }
-
-    .balance {
-      font-size: 35px;
-      color: #22c55e;
-      font-weight: bold;
-    }
-
-    .loading {
-      text-align: center;
-      margin-top: 100px;
-      color: #94a3b8;
-      font-size: 20px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KerjaCuan</title>
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-  <div id="loading" class="loading">
-    Memuat akun...
-  </div>
+<header class="header">
+  <div class="logo">KerjaCuan</div>
 
-  <div id="app" style="display:none;">
+  <a class="link" href="login.html">
+    Login
+  </a>
+</header>
 
-    <div class="header">
-      <div class="logo">KerjaCuan</div>
+<main class="container">
 
-      <button id="logoutButton" class="logout">
-        Keluar
+  <div class="card center">
+
+    <h1>KerjaCuan</h1>
+
+    <p class="subtitle">
+      Platform pekerjaan freelance sederhana.
+      Kerjakan tugas, kirim hasil, dan dapatkan reward
+      setelah hasil disetujui.
+    </p>
+
+    <a href="daftar.html">
+      <button class="btn">
+        Daftar Sekarang
       </button>
-    </div>
+    </a>
 
-    <div class="container">
+    <br><br>
 
-      <div class="card">
-        <h1>Halo 👋</h1>
-
-        <div id="userEmail" class="email">
-          -
-        </div>
-
-        <div>
-          Saldo kamu
-        </div>
-
-        <div id="balance" class="balance">
-          Rp0
-        </div>
-      </div>
-
-      <div class="card">
-        <h2>Tugas</h2>
-
-        <p style="margin-top:15px;color:#94a3b8;">
-          Belum ada tugas.
-        </p>
-      </div>
-
-    </div>
+    <a class="link" href="login.html">
+      Sudah punya akun? Login
+    </a>
 
   </div>
 
-
-  <script type="module">
-
-    import {
-      initializeApp
-    } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-
-    import {
-      getAuth,
-      onAuthStateChanged,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-
-
-    /* =========================
-       FIREBASE CONFIG
-       ========================= */
-
-    const firebaseConfig = {
-
-      apiKey: "AIzaSyCIZtNC_dqyP19htXNcdf3TZSDwGZqla5c",
-
-      authDomain:
-        "kerjacuan-374dd.firebaseapp.com",
-
-      projectId:
-        "kerjacuan-374dd",
-
-      storageBucket:
-        "kerjacuan-374dd.firebasestorage.app",
-
-      messagingSenderId:
-        "677864393276",
-
-      appId:
-        "1:677864393276:web:b6bd6852dc8ede6904d139",
-
-      measurementId:
-        "G-WZ27QDDH6L"
-    };
-
-
-    /* =========================
-       FIREBASE INIT
-       ========================= */
-
-    const app =
-      initializeApp(firebaseConfig);
-
-    const auth =
-      getAuth(app);
-
-
-    /* =========================
-       ELEMENT
-       ========================= */
-
-    const loading =
-      document.getElementById("loading");
-
-    const appPage =
-      document.getElementById("app");
-
-    const userEmail =
-      document.getElementById("userEmail");
-
-    const balance =
-      document.getElementById("balance");
-
-    const logoutButton =
-      document.getElementById("logoutButton");
-
-
-    /* =========================
-       CEK LOGIN
-       ========================= */
-
-    onAuthStateChanged(
-      auth,
-      function(user) {
-
-        console.log(
-          "STATUS LOGIN:",
-          user
-        );
-
-
-        if (user) {
-
-          /*
-           * USER SUDAH LOGIN
-           */
-
-          loading.style.display =
-            "none";
-
-          appPage.style.display =
-            "block";
-
-          userEmail.textContent =
-            user.email || "-";
-
-
-          /*
-           * Untuk sementara saldo Rp0
-           */
-
-          balance.textContent =
-            "Rp0";
-
-        }
-
-        else {
-
-          /*
-           * BELUM LOGIN
-           */
-
-          window.location.replace(
-            "login.html"
-          );
-
-        }
-
-      }
-    );
-
-
-    /* =========================
-       LOGOUT
-       ========================= */
-
-    logoutButton.addEventListener(
-      "click",
-      async function() {
-
-        try {
-
-          await signOut(auth);
-
-          window.location.replace(
-            "login.html"
-          );
-
-        } catch (error) {
-
-          console.error(error);
-
-          alert(
-            "Gagal keluar dari akun."
-          );
-
-        }
-
-      }
-    );
-
-  </script>
+</main>
 
 </body>
 </html>
