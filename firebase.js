@@ -23,14 +23,14 @@ import {
   runTransaction
 } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCIZNCT_dqyP19htXNcdf3TZSDwGZqla5c",
-  authDomain: "kerjajuan-374dd.firebaseapp.com",
-  projectId: "kerjajuan-374dd",
-  storageBucket: "kerjajuan-374dd.firebasestorage.app",
+onst firebaseConfig = {
+  apiKey: "AIzaSyCIZtNC_dqyP19htXNcdf3TZSDwGZqla5c",
+  authDomain: "kerjacuan-374dd.firebaseapp.com",
+  projectId: "kerjacuan-374dd",
+  storageBucket: "kerjacuan-374dd.firebasestorage.app",
   messagingSenderId: "677864393276",
   appId: "1:677864393276:web:b6bd6852dc8ede6904d139",
-  measurementId: "G-WZ7QDDH6L"
+  measurementId: "G-WZ27QDDH6L"
 };
 
 const app = initializeApp(firebaseConfig);
