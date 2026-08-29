@@ -1,12 +1,701 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin - KerjaCuan</title><link rel="stylesheet" href="styles.css"></head><body><header class="top"><div class="brand">KerjaCuan Admin</div><button id="logout" class="btn danger">Keluar</button></header><main class="container"><section class="card"><h2>Tambah Job</h2><label class="label">Judul</label><input id="title" class="input" placeholder="Contoh: Testing Website"><label class="label">Kategori</label><input id="category" class="input" placeholder="Testing"><label class="label">Reward (Rp)</label><input id="reward" class="input" type="number" min="0" placeholder="4300"><label class="label">Deskripsi</label><textarea id="description" class="textarea" placeholder="Jelaskan pekerjaan dengan jelas. Jangan meminta password/credential akun pribadi."></textarea><label class="label">Batas</label><input id="limit" class="input" placeholder="50 pekerja"><br><br><button id="create" class="btn" style="width:100%">+ Tambah Job</button><p id="jobmsg"></p></section><section class="card"><h2>Job Aktif</h2><div id="jobs" class="grid"></div></section><section class="card"><h2>Submission Menunggu</h2><div id="subs" class="grid"></div></section></main><script type="module">
-import {auth,db,onAuthStateChanged,signOut,doc,getDoc,addDoc,collection,query,orderBy,getDocs,updateDoc,runTransaction,serverTimestamp} from "./firebase.js";
-const $=id=>document.getElementById(id);let admin;
-const money=n=>new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(n||0);
-onAuthStateChanged(auth,async u=>{if(!u)return location.href="login.html";const p=await getDoc(doc(db,"users",u.uid));if(p.data()?.role!=="admin"){alert("Akses admin ditolak.");return location.href="worker.html"}admin=u;loadJobs();loadSubs();});
-$("logout").onclick=()=>signOut(auth).then(()=>location.href="login.html");
-$("create").onclick=async()=>{try{const title=$("title").value.trim(),description=$("description").value.trim(),reward=Number($("reward").value);if(!title||!description||reward<=0)throw Error("Judul, deskripsi, dan reward wajib diisi.");await addDoc(collection(db,"jobs"),{title,category:$("category").value.trim()||"Job",description,reward,limit:$("limit").value.trim()||"Tidak ditentukan",status:"open",createdBy:admin.uid,createdAt:serverTimestamp()});$("jobmsg").className="success";$("jobmsg").textContent="Job berhasil dibuat.";["title","category","reward","description","limit"].forEach(x=>$(x).value="");loadJobs();}catch(e){$("jobmsg").className="error";$("jobmsg").textContent=e.message}};
-async function loadJobs(){const box=$("jobs");box.innerHTML="";const snap=await getDocs(query(collection(db,"jobs"),orderBy("createdAt","desc")));for(const d of snap.docs){const j=d.data();const el=document.createElement("div");el.className="job";el.innerHTML=`<div class="row"><b>${esc(j.title)}</b><span class="reward">${money(j.reward)}</span></div><p>${esc(j.description)}</p><span class="pill">${j.status}</span>`;box.appendChild(el)}}
-async function loadSubs(){const box=$("subs");box.innerHTML="";const snap=await getDocs(query(collection(db,"submissions"),orderBy("createdAt","desc")));if(snap.empty){box.innerHTML='<div class="muted">Belum ada submission.</div>';return}for(const d of snap.docs){const s=d.data();const el=document.createElement("div");el.className="job";el.innerHTML=`<b>${esc(s.jobTitle)}</b><p>Pekerja: ${esc(s.workerEmail)}</p><p>Hasil: ${esc(s.result)}</p><div class="row"><span class="pill">${s.status}</span><b>${money(s.reward)}</b></div>`;if(s.status==="pending"){const b=document.createElement("button");b.className="btn";b.textContent="Approve + Saldo";b.onclick=()=>approve(d.id,s);el.appendChild(document.createElement("br"));el.appendChild(b)}box.appendChild(el)}}
-async function approve(subId,s){if(!confirm("Approve hasil ini dan tambahkan reward ke saldo pekerja?"))return;try{await runTransaction(db,async tx=>{const subRef=doc(db,"submissions",subId),userRef=doc(db,"users",s.workerId);const [subSnap,userSnap]=await Promise.all([tx.get(subRef),tx.get(userRef)]);if(!subSnap.exists())throw Error("Submission tidak ditemukan.");if(subSnap.data().status!=="pending")throw Error("Submission sudah diproses.");if(!userSnap.exists())throw Error("User tidak ditemukan.");const old=userSnap.data().balance||0;tx.update(subRef,{status:"approved",approvedBy:admin.uid,approvedAt:serverTimestamp()});tx.update(userRef,{balance:old+Number(s.reward||0),updatedAt:serverTimestamp()});});alert("Disetujui. Saldo bertambah.");loadSubs();}catch(e){alert(e.message)}}
-function esc(s=""){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
-</script></body></html>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin - KerjaCuan</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      color: #172033;
+    }
+
+    header {
+      background: #fff;
+      padding: 18px 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px #00000012;
+    }
+
+    header h1 {
+      margin: 0;
+      color: #16b957;
+      font-size: 25px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 12px 18px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .logout {
+      background: #e53935;
+      color: white;
+    }
+
+    main {
+      max-width: 1000px;
+      margin: auto;
+      padding: 25px 16px 80px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 18px;
+      padding: 22px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px #0000000c;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    label {
+      display: block;
+      margin-top: 14px;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #d8deea;
+      border-radius: 10px;
+      font-size: 15px;
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .primary {
+      margin-top: 18px;
+      background: #16b957;
+      color: white;
+      width: 100%;
+      font-size: 16px;
+    }
+
+    .job,
+    .submission {
+      border: 1px solid #e1e6ef;
+      border-radius: 14px;
+      padding: 16px;
+      margin-top: 12px;
+    }
+
+    .job h3,
+    .submission h3 {
+      margin: 0 0 8px;
+    }
+
+    .reward {
+      color: #16a34a;
+      font-weight: bold;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 20px;
+      background: #eef2ff;
+      margin-top: 7px;
+      font-size: 13px;
+    }
+
+    .approve {
+      background: #16b957;
+      color: white;
+      margin-top: 12px;
+    }
+
+    .reject {
+      background: #e53935;
+      color: white;
+      margin-top: 12px;
+      margin-left: 6px;
+    }
+
+    .empty {
+      color: #78849a;
+      padding: 10px 0;
+    }
+
+    #loading {
+      text-align: center;
+      padding: 30px;
+      color: #718096;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>KerjaCuan Admin</h1>
+  <button id="logout" class="logout">Keluar</button>
+</header>
+
+<main>
+
+  <div id="loading">Memeriksa akun...</div>
+
+  <section id="adminPanel" style="display:none">
+
+    <!-- TAMBAH JOB -->
+    <div class="card">
+      <h2>➕ Tambah Job</h2>
+
+      <label>Judul Job</label>
+      <input id="title" placeholder="Contoh: Desain poster sederhana">
+
+      <label>Deskripsi</label>
+      <textarea id="description"
+        placeholder="Jelaskan pekerjaan yang harus dilakukan worker"></textarea>
+
+      <label>Reward</label>
+      <input id="reward" type="number" min="0"
+        placeholder="Contoh: 4300">
+
+      <label>Kategori</label>
+      <select id="category">
+        <option value="umum">Umum</option>
+        <option value="desain">Desain</option>
+        <option value="menulis">Menulis</option>
+        <option value="data">Data Entry</option>
+        <option value="lainnya">Lainnya</option>
+      </select>
+
+      <button id="createJob" class="primary">
+        Publikasikan Job
+      </button>
+    </div>
+
+    <!-- DAFTAR JOB -->
+    <div class="card">
+      <h2>📋 Daftar Job</h2>
+      <div id="jobs">
+        <div class="empty">Memuat job...</div>
+      </div>
+    </div>
+
+    <!-- SUBMISSION -->
+    <div class="card">
+      <h2>📨 Pengajuan Worker</h2>
+      <div id="submissions">
+        <div class="empty">Memuat pengajuan...</div>
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
+<script type="module">
+
+  import {
+    auth,
+    db,
+    onAuthStateChanged,
+    signOut,
+    doc,
+    getDoc,
+    setDoc,
+    getDocs,
+    collection,
+    query,
+    orderBy,
+    serverTimestamp,
+    runTransaction
+  } from "./firebase.js";
+
+
+  const loading = document.getElementById("loading");
+  const panel = document.getElementById("adminPanel");
+
+
+  // =========================
+  // CEK ADMIN
+  // =========================
+
+  onAuthStateChanged(auth, async (user) => {
+
+    if (!user) {
+      window.location.href = "login.html";
+      return;
+    }
+
+    try {
+
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (!userSnap.exists() ||
+          userSnap.data().role !== "admin") {
+
+        alert("Akun ini bukan admin.");
+        window.location.href = "index.html";
+        return;
+      }
+
+      loading.style.display = "none";
+      panel.style.display = "block";
+
+      loadJobs();
+      loadSubmissions();
+
+    } catch (error) {
+
+      console.error(error);
+      alert("Gagal memeriksa akun admin.");
+    }
+
+  });
+
+
+  // =========================
+  // LOGOUT
+  // =========================
+
+  document.getElementById("logout").onclick = async () => {
+
+    await signOut(auth);
+
+    window.location.href = "login.html";
+  };
+
+
+  // =========================
+  // BUAT JOB
+  // =========================
+
+  document.getElementById("createJob").onclick = async () => {
+
+    const title =
+      document.getElementById("title").value.trim();
+
+    const description =
+      document.getElementById("description").value.trim();
+
+    const reward =
+      Number(document.getElementById("reward").value);
+
+    const category =
+      document.getElementById("category").value;
+
+
+    if (!title || !description || !reward) {
+
+      alert("Lengkapi semua data job.");
+      return;
+    }
+
+
+    try {
+
+      const jobRef =
+        doc(collection(db, "jobs"));
+
+      await setDoc(jobRef, {
+
+        title,
+        description,
+        reward,
+        category,
+
+        status: "active",
+
+        createdAt: serverTimestamp(),
+
+        totalWorkers: 0
+
+      });
+
+
+      document.getElementById("title").value = "";
+      document.getElementById("description").value = "";
+      document.getElementById("reward").value = "";
+
+
+      alert("Job berhasil dibuat.");
+
+      loadJobs();
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert("Gagal membuat job.");
+    }
+
+  };
+
+
+  // =========================
+  // LOAD JOB
+  // =========================
+
+  async function loadJobs() {
+
+    const box =
+      document.getElementById("jobs");
+
+    box.innerHTML =
+      '<div class="empty">Memuat...</div>';
+
+
+    try {
+
+      const q =
+        query(
+          collection(db, "jobs"),
+          orderBy("createdAt", "desc")
+        );
+
+      const snap = await getDocs(q);
+
+
+      if (snap.empty) {
+
+        box.innerHTML =
+          '<div class="empty">Belum ada job.</div>';
+
+        return;
+      }
+
+
+      box.innerHTML = "";
+
+
+      snap.forEach((item) => {
+
+        const data = item.data();
+
+
+        const div =
+          document.createElement("div");
+
+        div.className = "job";
+
+
+        div.innerHTML = `
+
+          <h3>${escapeHTML(data.title)}</h3>
+
+          <p>
+            ${escapeHTML(data.description)}
+          </p>
+
+          <div class="reward">
+            Reward: Rp${Number(data.reward).toLocaleString("id-ID")}
+          </div>
+
+          <div class="status">
+            ${escapeHTML(data.status || "active")}
+          </div>
+
+        `;
+
+
+        box.appendChild(div);
+
+      });
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      box.innerHTML =
+        '<div class="empty">Gagal memuat job.</div>';
+    }
+
+  }
+
+
+  // =========================
+  // LOAD SUBMISSION
+  // =========================
+
+  async function loadSubmissions() {
+
+    const box =
+      document.getElementById("submissions");
+
+    box.innerHTML =
+      '<div class="empty">Memuat...</div>';
+
+
+    try {
+
+      const q =
+        query(
+          collection(db, "submissions"),
+          orderBy("createdAt", "desc")
+        );
+
+
+      const snap =
+        await getDocs(q);
+
+
+      if (snap.empty) {
+
+        box.innerHTML =
+          '<div class="empty">Belum ada pengajuan.</div>';
+
+        return;
+      }
+
+
+      box.innerHTML = "";
+
+
+      snap.forEach((item) => {
+
+        const data = item.data();
+
+
+        const div =
+          document.createElement("div");
+
+        div.className = "submission";
+
+
+        div.innerHTML = `
+
+          <h3>
+            ${escapeHTML(data.jobTitle || "Job")}
+          </h3>
+
+          <p>
+            Worker:
+            ${escapeHTML(data.workerEmail || data.workerId || "-")}
+          </p>
+
+          <p>
+            Hasil:
+            ${escapeHTML(data.result || "-")}
+          </p>
+
+          <div class="status">
+            Status: ${escapeHTML(data.status || "pending")}
+          </div>
+
+        `;
+
+
+        if (data.status === "pending") {
+
+          const approve =
+            document.createElement("button");
+
+          approve.className = "approve";
+          approve.textContent = "✓ Approve";
+
+          approve.onclick = () =>
+            approveSubmission(item.id);
+
+
+          const reject =
+            document.createElement("button");
+
+          reject.className = "reject";
+          reject.textContent = "✕ Tolak";
+
+          reject.onclick = () =>
+            rejectSubmission(item.id);
+
+
+          div.appendChild(approve);
+          div.appendChild(reject);
+        }
+
+
+        box.appendChild(div);
+
+      });
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      box.innerHTML =
+        '<div class="empty">Gagal memuat pengajuan.</div>';
+    }
+
+  }
+
+
+  // =========================
+  // APPROVE + SALDO OTOMATIS
+  // =========================
+
+  async function approveSubmission(submissionId) {
+
+    if (!confirm("Approve pengajuan ini dan tambahkan reward?")) {
+      return;
+    }
+
+
+    try {
+
+      await runTransaction(db, async (transaction) => {
+
+        const submissionRef =
+          doc(db, "submissions", submissionId);
+
+        const submissionSnap =
+          await transaction.get(submissionRef);
+
+
+        if (!submissionSnap.exists()) {
+          throw new Error("Submission tidak ditemukan.");
+        }
+
+
+        const submission =
+          submissionSnap.data();
+
+
+        if (submission.status !== "pending") {
+          throw new Error("Submission sudah diproses.");
+        }
+
+
+        const workerRef =
+          doc(db, "users", submission.workerId);
+
+        const workerSnap =
+          await transaction.get(workerRef);
+
+
+        if (!workerSnap.exists()) {
+          throw new Error("Akun worker tidak ditemukan.");
+        }
+
+
+        const worker =
+          workerSnap.data();
+
+
+        const oldBalance =
+          Number(worker.balance || 0);
+
+        const reward =
+          Number(submission.reward || 0);
+
+
+        transaction.update(
+          workerRef,
+          {
+            balance: oldBalance + reward
+          }
+        );
+
+
+        transaction.update(
+          submissionRef,
+          {
+            status: "approved",
+            approvedAt: serverTimestamp()
+          }
+        );
+
+      });
+
+
+      alert("Pengajuan disetujui. Saldo worker bertambah.");
+
+      loadSubmissions();
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        "Gagal approve: " +
+        error.message
+      );
+    }
+
+  }
+
+
+  // =========================
+  // TOLAK
+  // =========================
+
+  async function rejectSubmission(submissionId) {
+
+    if (!confirm("Tolak pengajuan ini?")) {
+      return;
+    }
+
+
+    try {
+
+      await setDoc(
+        doc(db, "submissions", submissionId),
+        {
+          status: "rejected",
+          rejectedAt: serverTimestamp()
+        },
+        {
+          merge: true
+        }
+      );
+
+
+      alert("Pengajuan ditolak.");
+
+      loadSubmissions();
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert("Gagal menolak pengajuan.");
+    }
+
+  }
+
+
+  // =========================
+  // ANTI HTML INJECTION
+  // =========================
+
+  function escapeHTML(value = "") {
+
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+</script>
+
+</body>
+</html>
