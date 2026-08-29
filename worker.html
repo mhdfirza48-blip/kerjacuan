@@ -2,381 +2,294 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Worker - KerjaCuan</title>
-  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      color: #17233c;
+    }
+
+    header {
+      background: white;
+      padding: 20px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,.08);
+    }
+
+    .logo {
+      font-size: 32px;
+      font-weight: 800;
+      color: #16b957;
+    }
+
+    .logout {
+      border: none;
+      background: #2468c9;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    main {
+      max-width: 1000px;
+      margin: 35px auto;
+      padding: 0 20px;
+    }
+
+    .welcome {
+      background: white;
+      border-radius: 20px;
+      padding: 25px;
+      margin-bottom: 25px;
+      box-shadow: 0 5px 20px rgba(0,0,0,.06);
+    }
+
+    .welcome h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+    }
+
+    .welcome p {
+      margin: 0;
+      color: #718096;
+      font-size: 17px;
+    }
+
+    .section-title {
+      font-size: 25px;
+      font-weight: 800;
+      margin: 25px 0 15px;
+    }
+
+    #jobs {
+      display: grid;
+      gap: 18px;
+    }
+
+    .job {
+      background: white;
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 5px 20px rgba(0,0,0,.06);
+      border: 1px solid #edf0f5;
+    }
+
+    .job h2 {
+      margin: 0 0 10px;
+      font-size: 21px;
+    }
+
+    .description {
+      color: #667085;
+      line-height: 1.6;
+      margin-bottom: 15px;
+    }
+
+    .bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .reward {
+      font-size: 20px;
+      font-weight: 800;
+      color: #16a34a;
+    }
+
+    .status {
+      display: inline-block;
+      background: #dcfce7;
+      color: #15803d;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: bold;
+      margin-top: 8px;
+    }
+
+    .work-btn {
+      border: none;
+      background: #20bf55;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .work-btn:hover {
+      background: #16a34a;
+    }
+
+    .empty {
+      background: white;
+      padding: 35px;
+      text-align: center;
+      border-radius: 18px;
+      color: #718096;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 30px;
+      color: #718096;
+    }
+
+    .error {
+      background: #fee2e2;
+      color: #b91c1c;
+      padding: 18px;
+      border-radius: 12px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        padding: 16px 18px;
+      }
+
+      .logo {
+        font-size: 27px;
+      }
+
+      main {
+        margin-top: 25px;
+        padding: 0 14px;
+      }
+
+      .welcome h1 {
+        font-size: 24px;
+      }
+
+      .job {
+        padding: 18px;
+      }
+
+      .bottom {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .work-btn {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<nav class="navbar">
+<header>
+  <div class="logo">KerjaCuan</div>
+  <button class="logout" id="logout">Keluar</button>
+</header>
 
-  <a href="worker.html" class="logo">
-    KerjaCuan
-  </a>
+<main>
 
-  <button id="logout" class="btn btn-red">
-    Keluar
-  </button>
-
-</nav>
-
-<main class="container">
-
-  <div class="card">
-
-    <h2>Halo 👋</h2>
-
-    <div id="name" class="muted">
-      Memuat...
-    </div>
-
-    <p>Saldo kamu</p>
-
-    <div id="balance" class="balance">
-      Rp0
-    </div>
-
+  <div class="welcome">
+    <h1>Dashboard Worker</h1>
+    <p id="userEmail">Memuat akun...</p>
   </div>
 
+  <div class="section-title">
+    Tugas Tersedia
+  </div>
 
-  <div class="card">
-
-    <h2 class="title">Tugas</h2>
-
-    <p class="muted">
-      Pilih pekerjaan yang tersedia.
-    </p>
-
-    <div id="jobs">
+  <div id="jobs">
+    <div class="loading">
       Memuat tugas...
     </div>
-
-  </div>
-
-
-  <div class="card">
-
-    <h2 class="title">
-      Kiriman Saya
-    </h2>
-
-    <div id="submissions">
-      Memuat...
-    </div>
-
   </div>
 
 </main>
 
-
 <script type="module">
 
-import {
-  auth,
-  db,
-  onAuthStateChanged,
-  signOut,
-  getDoc,
-  getDocs,
-  doc,
-  collection,
-  addDoc,
-  query,
-  orderBy,
-  serverTimestamp
-} from "./firebase.js";
-
-
-const nameBox =
-  document.getElementById("name");
-
-const balanceBox =
-  document.getElementById("balance");
-
-const jobsBox =
-  document.getElementById("jobs");
-
-const submissionsBox =
-  document.getElementById("submissions");
-
-
-let currentUser = null;
-
-
-function rupiah(value) {
-
-  return new Intl.NumberFormat(
-    "id-ID",
-    {
-      style: "currency",
-      currency: "IDR",
-      maximumFractionDigits: 0
-    }
-  ).format(value || 0);
-
-}
-
-
-onAuthStateChanged(auth, async user => {
-
-  if (!user) {
-
-    window.location.href = "login.html";
-    return;
-
-  }
-
-  currentUser = user;
-
-  await loadUser();
-  await loadJobs();
-  await loadSubmissions();
-
-});
-
-
-async function loadUser() {
-
-  const snap =
-    await getDoc(
-      doc(db, "users", currentUser.uid)
-    );
-
-  if (!snap.exists()) return;
-
-  const data = snap.data();
-
-  nameBox.textContent =
-    data.name || currentUser.email;
-
-  balanceBox.textContent =
-    rupiah(data.balance || 0);
-
-}
-
-
-async function loadJobs() {
-
-  jobsBox.innerHTML = "";
-
-  const q =
-    query(
-      collection(db, "jobs"),
-      orderBy("createdAt", "desc")
-    );
-
-  const snap = await getDocs(q);
-
-  let count = 0;
-
-  snap.forEach(jobDoc => {
-
-    const job = jobDoc.data();
-
-    if (job.active === false) return;
-
-    count++;
-
-    const div =
-      document.createElement("div");
-
-    div.className = "job";
-
-    div.innerHTML = `
-      <h3>${esc(job.title)}</h3>
-
-      <p class="muted">
-        ${esc(job.description || "")}
-      </p>
-
-      <p class="reward">
-        Reward ${rupiah(job.reward)}
-      </p>
-
-      <button class="btn btn-blue">
-        Kerjakan
-      </button>
-
-      <div class="submit-area"></div>
-    `;
-
-    const button =
-      div.querySelector("button");
-
-    const area =
-      div.querySelector(".submit-area");
-
-    button.onclick = () => {
-
-      button.style.display = "none";
-
-      area.innerHTML = `
-
-        <textarea
-          class="result"
-          placeholder="Tulis hasil pekerjaan kamu di sini..."
-        ></textarea>
-
-        <button class="btn btn-primary">
-          Kirim Hasil
-        </button>
-
-      `;
-
-      area.querySelector("button")
-        .onclick = async () => {
-
-          const result =
-            area.querySelector(".result")
-              .value
-              .trim();
-
-          if (!result) {
-
-            alert("Hasil belum diisi.");
-            return;
-
-          }
-
-          try {
-
-            await addDoc(
-              collection(db, "submissions"),
-              {
-                jobId: jobDoc.id,
-                jobTitle: job.title,
-                workerId: currentUser.uid,
-                workerEmail: currentUser.email,
-                result: result,
-                reward: Number(job.reward) || 0,
-                status: "pending",
-                createdAt: serverTimestamp()
-              }
-            );
-
-            alert(
-              "Hasil berhasil dikirim dan menunggu persetujuan admin."
-            );
-
-            area.innerHTML =
-              `<p class="success">
-                Hasil sudah dikirim.
-              </p>`;
-
-            await loadSubmissions();
-
-          } catch (error) {
-
-            alert(
-              "Gagal mengirim: " +
-              error.message
-            );
-
-          }
-
-        };
-
-    };
-
-    jobsBox.appendChild(div);
-
-  });
-
-  if (count === 0) {
-
-    jobsBox.innerHTML =
-      `<div class="empty">
-        Belum ada tugas.
-      </div>`;
-
-  }
-
-}
-
-
-async function loadSubmissions() {
-
-  submissionsBox.innerHTML = "";
-
-  const snap =
-    await getDocs(
-      collection(db, "submissions")
-    );
-
-  let count = 0;
-
-  snap.forEach(item => {
-
-    const data = item.data();
-
-    if (
-      data.workerId !== currentUser.uid
-    ) return;
-
-    count++;
-
-    const div =
-      document.createElement("div");
-
-    div.className = "job";
-
-    div.innerHTML = `
-      <h3>${esc(data.jobTitle || "Tugas")}</h3>
-
-      <p>
-        ${esc(data.result || "")}
-      </p>
-
-      <p>
-        Reward:
-        <b>${rupiah(data.reward)}</b>
-      </p>
-
-      <span class="status ${data.status}">
-        ${esc(data.status)}
-      </span>
-    `;
-
-    submissionsBox.appendChild(div);
-
-  });
-
-  if (count === 0) {
-
-    submissionsBox.innerHTML =
-      `<div class="empty">
-        Belum ada kiriman.
-      </div>`;
-
-  }
-
-}
-
-
-function esc(value) {
-
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-
-}
-
-
-document.getElementById("logout")
-  .onclick = async () => {
-
-    await signOut(auth);
-
-    window.location.href =
-      "login.html";
-
+  import {
+    initializeApp
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+  import {
+    getAuth,
+    onAuthStateChanged,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+  import {
+    getFirestore,
+    collection,
+    query,
+    where,
+    getDocs,
+    orderBy
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+  // =========================
+  // FIREBASE CONFIG
+  // =========================
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCIZtNC_dqyP19htXNcdf3TZSDwGZqla5c",
+    authDomain: "kerjacuan-374dd.firebaseapp.com",
+    projectId: "kerjacuan-374dd",
+    storageBucket: "kerjacuan-374dd.firebasestorage.app",
+    messagingSenderId: "677864393276",
+    appId: "1:677864393276:web:b6bd6852dc8ede6904d139",
+    measurementId: "G-WZ27QDDH6L"
   };
 
-</script>
 
-</body>
-</html>
+  // =========================
+  // INIT FIREBASE
+  // =========================
+
+  const app = initializeApp(firebaseConfig);
+
+  const auth = getAuth(app);
+
+  const db = getFirestore(app);
+
+
+  // =========================
+  // ELEMENT
+  // =========================
+
+  const jobsBox = document.getElementById("jobs");
+  const userEmail = document.getElementById("userEmail");
+  const logout = document.getElementById("logout");
+
+
+  // =========================
+  // LOGOUT
+  // =========================
+
+  logout.addEventListener("click", async () => {
+
+    try {
+
+      await signOut(auth);
+
+      window.location.href = "login.html";
+
+    } catch (error) {
+
+     
