@@ -94,6 +94,7 @@
       display: none;
       text-align: center;
       font-size: 14px;
+      word-break: break-word;
     }
 
     .error {
@@ -139,6 +140,7 @@
         type="email"
         id="email"
         placeholder="Masukkan email"
+        autocomplete="email"
         required
       >
 
@@ -148,6 +150,7 @@
         type="password"
         id="password"
         placeholder="Masukkan password"
+        autocomplete="current-password"
         required
       >
 
@@ -210,7 +213,7 @@
 
 
     // =========================
-    // INITIALIZE FIREBASE
+    // FIREBASE
     // =========================
 
     const app = initializeApp(firebaseConfig);
@@ -258,23 +261,42 @@
 
       e.preventDefault();
 
+
       const email =
-        document.getElementById("email").value.trim();
+        document.getElementById("email")
+          .value
+          .trim();
 
       const password =
-        document.getElementById("password").value;
+        document.getElementById("password")
+          .value;
+
+
+      if (!email || !password) {
+
+        showMessage(
+          "Email dan password wajib diisi.",
+          "error"
+        );
+
+        return;
+      }
 
 
       loginButton.disabled = true;
 
-      loginButton.textContent = "Memproses...";
+      loginButton.textContent =
+        "Memproses...";
 
-      message.style.display = "none";
+      message.style.display =
+        "none";
 
 
       try {
 
+        // =========================
         // LOGIN FIREBASE AUTH
+        // =========================
 
         const userCredential =
           await signInWithEmailAndPassword(
@@ -288,134 +310,196 @@
           userCredential.user;
 
 
+        console.log(
+          "Login Auth berhasil:",
+          user.uid
+        );
+
+
         // =========================
-        // CEK DATA USER DI FIRESTORE
+        // AMBIL DATA USER
         // =========================
 
         const userRef =
-          doc(db, "users", user.uid);
+          doc(
+            db,
+            "users",
+            user.uid
+          );
+
 
         const userSnap =
           await getDoc(userRef);
 
 
-        if (userSnap.exists()) {
+        // =========================
+        // DATA USER TIDAK ADA
+        // =========================
 
-          const userData =
-            userSnap.data();
-
-
-          // =========================
-          // ADMIN
-          // =========================
-
-          if (userData.role === "admin") {
-
-            showMessage(
-              "Login admin berhasil. Mengarahkan...",
-              "success"
-            );
-
-            setTimeout(() => {
-
-              window.location.href =
-                "admin.html";
-
-            }, 800);
-
-            return;
-          }
-
-
-          // =========================
-          // USER BIASA
-          // =========================
+        if (!userSnap.exists()) {
 
           showMessage(
-            "Login berhasil. Mengarahkan...",
+            "Login berhasil, tetapi data users untuk UID ini belum ada di Firestore.",
+            "error"
+          );
+
+          console.error(
+            "Dokumen users tidak ditemukan. UID:",
+            user.uid
+          );
+
+          loginButton.disabled = false;
+
+          loginButton.textContent =
+            "Login";
+
+          return;
+        }
+
+
+        // =========================
+        // DATA USER
+        // =========================
+
+        const userData =
+          userSnap.data();
+
+
+        console.log(
+          "Data Firestore:",
+          userData
+        );
+
+
+        // =========================
+        // ADMIN
+        // =========================
+
+        if (userData.role === "admin") {
+
+          showMessage(
+            "Login admin berhasil!",
             "success"
           );
+
 
           setTimeout(() => {
 
             window.location.href =
-              "index.html";
+              "admin.html";
 
-          }, 800);
+          }, 700);
 
+
+          return;
         }
 
-        else {
 
-          // AKUN AUTH ADA,
-          // TAPI DATA USERS BELUM ADA
+        // =========================
+        // USER BIASA
+        // =========================
 
-          showMessage(
-            "Akun berhasil login, tetapi data pengguna belum ditemukan.",
-            "error"
-          );
+        showMessage(
+          "Login berhasil!",
+          "success"
+        );
 
-        }
+
+        setTimeout(() => {
+
+          window.location.href =
+            "index.html";
+
+        }, 700);
 
       }
 
+
       catch (error) {
 
-        console.error(error);
+        console.error(
+          "Firebase Login Error:",
+          error
+        );
 
 
         let errorMessage =
           "Login gagal.";
 
 
-        if (
-          error.code ===
-          "auth/invalid-credential"
-        ) {
+        switch (error.code) {
 
-          errorMessage =
-            "Email atau password salah.";
+          case "auth/invalid-credential":
 
-        }
+            errorMessage =
+              "Email atau password salah.";
 
-        else if (
-          error.code ===
-          "auth/user-not-found"
-        ) {
+            break;
 
-          errorMessage =
-            "Akun tidak ditemukan.";
 
-        }
+          case "auth/user-not-found":
 
-        else if (
-          error.code ===
-          "auth/wrong-password"
-        ) {
+            errorMessage =
+              "Akun tidak ditemukan.";
 
-          errorMessage =
-            "Password salah.";
+            break;
 
-        }
 
-        else if (
-          error.code ===
-          "auth/invalid-email"
-        ) {
+          case "auth/wrong-password":
 
-          errorMessage =
-            "Format email tidak valid.";
+            errorMessage =
+              "Password salah.";
 
-        }
+            break;
 
-        else if (
-          error.code ===
-          "auth/too-many-requests"
-        ) {
 
-          errorMessage =
-            "Terlalu banyak percobaan. Coba lagi nanti.";
+          case "auth/invalid-email":
 
+            errorMessage =
+              "Format email tidak valid.";
+
+            break;
+
+
+          case "auth/too-many-requests":
+
+            errorMessage =
+              "Terlalu banyak percobaan login. Coba lagi nanti.";
+
+            break;
+
+
+          case "auth/unauthorized-domain":
+
+            errorMessage =
+              "Domain website belum diizinkan di Firebase Authentication. Tambahkan mhdfirza48-blip.github.io di Authorized domains.";
+
+            break;
+
+
+          case "auth/network-request-failed":
+
+            errorMessage =
+              "Koneksi internet bermasalah.";
+
+            break;
+
+
+          case "permission-denied":
+
+            errorMessage =
+              "Login berhasil, tetapi Firestore menolak akses data users.";
+
+            break;
+
+
+          default:
+
+            errorMessage =
+              "Error: " +
+              (error.code || error.message);
+
+            break;
         }
 
 
