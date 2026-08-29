@@ -1,0 +1,46 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut
+} from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCIZtNC_dqyP19htXNcdf3TZSDwGZqla5c",
+  authDomain: "kerjacuan-374dd.firebaseapp.com",
+  projectId: "kerjacuan-374dd",
+  storageBucket: "kerjacuan-374dd.firebasestorage.app",
+  messagingSenderId: "677864393276",
+  appId: "1:677864393276:web:b6bd6852dc8ede6904d139",
+  measurementId: "G-WZ27QDDH6L"
+};
+
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+export {
+  app,
+  auth,
+  db,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  doc,
+  getDoc,
+  setDoc,
+  serverTimestamp
+};
