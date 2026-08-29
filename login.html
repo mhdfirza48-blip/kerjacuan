@@ -9,141 +9,154 @@
   <style>
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
     }
 
     body {
+      margin: 0;
       min-height: 100vh;
-      background: #0f172a;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #0d1528;
       color: white;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      padding: 20px;
     }
 
-    .login-box {
+    .container {
       width: 100%;
-      max-width: 400px;
-      background: #1e293b;
-      padding: 30px;
-      border-radius: 18px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      max-width: 620px;
+      background: #1e2a40;
+      border-radius: 28px;
+      padding: 45px 50px;
+      box-shadow: 0 20px 50px rgba(0,0,0,.3);
     }
 
     .logo {
       text-align: center;
-      font-size: 32px;
+      font-size: 48px;
       font-weight: bold;
-      color: #22c55e;
+      color: #20d05a;
       margin-bottom: 8px;
     }
 
     .subtitle {
       text-align: center;
-      color: #94a3b8;
-      margin-bottom: 28px;
-      font-size: 16px;
+      color: #aebbd0;
+      font-size: 25px;
+      margin-bottom: 45px;
     }
 
     label {
       display: block;
-      margin-bottom: 8px;
-      color: #e2e8f0;
-      font-size: 14px;
+      font-size: 20px;
+      margin-bottom: 10px;
+      color: #e7edf7;
     }
 
     input {
       width: 100%;
-      padding: 14px;
-      margin-bottom: 18px;
-      border: 1px solid #475569;
-      border-radius: 10px;
-      background: #0f172a;
-      color: white;
-      font-size: 16px;
+      height: 65px;
+      padding: 0 20px;
+      border-radius: 15px;
+      border: 1px solid #45536b;
       outline: none;
+
+      background: #0d162b;
+      color: white;
+
+      font-size: 19px;
+      margin-bottom: 25px;
     }
 
     input:focus {
-      border-color: #22c55e;
-    }
-
-    input::placeholder {
-      color: #64748b;
+      border-color: #20d05a;
     }
 
     button {
       width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: 10px;
-      background: #22c55e;
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.2s;
-    }
+      height: 65px;
 
-    button:hover {
-      background: #16a34a;
+      border: none;
+      border-radius: 15px;
+
+      background: #20c85a;
+      color: white;
+
+      font-size: 21px;
+      font-weight: bold;
+
+      cursor: pointer;
     }
 
     button:disabled {
-      background: #64748b;
-      cursor: not-allowed;
-    }
-
-    .message {
-      margin-top: 15px;
-      padding: 12px;
-      border-radius: 8px;
-      display: none;
-      text-align: center;
-      font-size: 14px;
-      line-height: 1.5;
-      word-break: break-word;
+      opacity: .6;
     }
 
     .error {
-      background: #7f1d1d;
-      color: #fecaca;
+      display: none;
+
+      margin-top: 20px;
+      padding: 18px;
+
+      background: #8e1d20;
+      color: white;
+
+      border-radius: 12px;
+
+      font-size: 17px;
+      line-height: 1.5;
     }
 
     .success {
-      background: #14532d;
-      color: #bbf7d0;
+      display: none;
+
+      margin-top: 20px;
+      padding: 18px;
+
+      background: #146c36;
+      color: white;
+
+      border-radius: 12px;
+
+      font-size: 17px;
     }
 
     .register {
       text-align: center;
-      margin-top: 20px;
-      color: #94a3b8;
-      font-size: 14px;
+      margin-top: 35px;
+
+      color: #aebbd0;
+      font-size: 19px;
     }
 
     .register a {
-      color: #22c55e;
+      color: #20d05a;
       text-decoration: none;
       font-weight: bold;
     }
 
-    .register a:hover {
-      text-decoration: underline;
-    }
+    @media (max-width: 600px) {
+      .container {
+        padding: 35px 25px;
+      }
 
-    .loading {
-      opacity: 0.8;
+      .logo {
+        font-size: 40px;
+      }
+
+      .subtitle {
+        font-size: 21px;
+      }
     }
   </style>
 </head>
 
 <body>
 
-  <div class="login-box">
+  <div class="container">
 
     <div class="logo">
       KerjaCuan
@@ -160,10 +173,9 @@
       </label>
 
       <input
-        type="email"
         id="email"
+        type="email"
         placeholder="Masukkan email"
-        autocomplete="email"
         required
       >
 
@@ -172,454 +184,170 @@
       </label>
 
       <input
-        type="password"
         id="password"
+        type="password"
         placeholder="Masukkan password"
-        autocomplete="current-password"
         required
       >
 
-      <button
-        type="submit"
-        id="loginButton"
-      >
+      <button id="loginButton" type="submit">
         Login
       </button>
 
     </form>
 
-    <div
-      id="message"
-      class="message">
+    <div id="errorBox" class="error"></div>
+
+    <div id="successBox" class="success">
+      Login berhasil. Mengarahkan...
     </div>
 
     <div class="register">
       Belum punya akun?
-      <a href="register.html">
-        Daftar
-      </a>
+      <a href="daftar.html">Daftar</a>
     </div>
 
   </div>
 
 
-  <!-- ========================================= -->
-  <!-- FIREBASE -->
-  <!-- ========================================= -->
-
   <script type="module">
 
     import {
-      initializeApp
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
-    import {
-      getAuth,
+      auth,
       signInWithEmailAndPassword
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-    import {
-      getFirestore,
-      doc,
-      getDoc
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    } from "./firebase.js";
 
 
-    // =========================================
-    // FIREBASE CONFIG
-    // =========================================
+    const form = document.getElementById("loginForm");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
 
-    const firebaseConfig = {
+    const loginButton = document.getElementById("loginButton");
 
-      apiKey: "AIzaSyCIZtNC_dqyP19htXNcdf3TZSDWwGZqla5c",
-
-      authDomain: "kerjacuan-374dd.firebaseapp.com",
-
-      projectId: "kerjacuan-374dd",
-
-      storageBucket: "kerjacuan-374dd.firebasestorage.app",
-
-      messagingSenderId: "677864393276",
-
-      appId: "1:677864393276:web:b6bd6852dc8ede6904d139",
-
-      measurementId: "G-WZ27QDDH6L"
-
-    };
+    const errorBox = document.getElementById("errorBox");
+    const successBox = document.getElementById("successBox");
 
 
-    // =========================================
-    // INITIALIZE FIREBASE
-    // =========================================
+    function showError(message) {
 
-    const app =
-      initializeApp(firebaseConfig);
+      errorBox.style.display = "block";
+      errorBox.textContent = message;
 
-    const auth =
-      getAuth(app);
-
-    const db =
-      getFirestore(app);
-
-
-    // =========================================
-    // ELEMENT
-    // =========================================
-
-    const loginForm =
-      document.getElementById("loginForm");
-
-    const loginButton =
-      document.getElementById("loginButton");
-
-    const message =
-      document.getElementById("message");
-
-
-    // =========================================
-    // SHOW MESSAGE
-    // =========================================
-
-    function showMessage(text, type) {
-
-      message.textContent = text;
-
-      message.className =
-        "message " + type;
-
-      message.style.display =
-        "block";
+      successBox.style.display = "none";
     }
 
 
-    // =========================================
-    // FIREBASE ERROR
-    // =========================================
+    function showSuccess() {
 
-    function getErrorMessage(error) {
-
-      console.error("Firebase Error:", error);
-
-      console.error(
-        "Error Code:",
-        error.code
-      );
-
-      console.error(
-        "Error Message:",
-        error.message
-      );
-
-
-      switch (error.code) {
-
-        // AUTH
-
-        case "auth/invalid-credential":
-          return "Email atau password salah.";
-
-        case "auth/invalid-login-credentials":
-          return "Email atau password salah.";
-
-        case "auth/user-not-found":
-          return "Akun tidak ditemukan.";
-
-        case "auth/wrong-password":
-          return "Password salah.";
-
-        case "auth/invalid-email":
-          return "Format email tidak valid.";
-
-        case "auth/user-disabled":
-          return "Akun ini telah dinonaktifkan.";
-
-        case "auth/too-many-requests":
-          return "Terlalu banyak percobaan login. Coba lagi nanti.";
-
-        case "auth/network-request-failed":
-          return "Koneksi internet bermasalah.";
-
-        case "auth/operation-not-allowed":
-          return "Login Email/Password belum diaktifkan di Firebase.";
-
-        // FIRESTORE
-
-        case "permission-denied":
-          return "Firestore menolak akses. Periksa Firestore Rules.";
-
-        case "unavailable":
-          return "Firestore tidak tersedia. Periksa koneksi internet dan Firestore.";
-
-        case "failed-precondition":
-          return "Firestore belum siap atau konfigurasi database bermasalah.";
-
-        case "not-found":
-          return "Dokumen pengguna tidak ditemukan.";
-
-        case "deadline-exceeded":
-          return "Koneksi ke Firestore terlalu lama.";
-
-        case "unauthenticated":
-          return "Sesi Firebase belum terautentikasi.";
-
-        default:
-
-          return (
-            "Error: " +
-            (error.code || "unknown") +
-            " - " +
-            (error.message || "Terjadi kesalahan.")
-          );
-      }
+      errorBox.style.display = "none";
+      successBox.style.display = "block";
     }
 
 
-    // =========================================
-    // LOGIN
-    // =========================================
+    form.addEventListener("submit", async function(event) {
 
-    loginForm.addEventListener(
-      "submit",
-      async function(e) {
+      event.preventDefault();
 
-        e.preventDefault();
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
 
 
-        const email =
-          document
-            .getElementById("email")
-            .value
-            .trim();
+      if (!email || !password) {
+
+        showError("Email dan password wajib diisi.");
+
+        return;
+      }
 
 
-        const password =
-          document
-            .getElementById("password")
-            .value;
+      loginButton.disabled = true;
+      loginButton.textContent = "Memproses...";
 
 
-        if (!email || !password) {
+      try {
 
-          showMessage(
-            "Email dan password wajib diisi.",
-            "error"
-          );
-
-          return;
-        }
-
-
-        // =====================================
-        // DISABLE BUTTON
-        // =====================================
-
-        loginButton.disabled = true;
-
-        loginButton.textContent =
-          "Memproses...";
-
-        loginButton.classList.add(
-          "loading"
+        await signInWithEmailAndPassword(
+          auth,
+          email,
+          password
         );
 
-        message.style.display =
-          "none";
+
+        showSuccess();
 
 
-        try {
+        setTimeout(() => {
 
-          // ===================================
-          // LOGIN FIREBASE AUTHENTICATION
-          // ===================================
+          window.location.href = "index.html";
 
-          console.log(
-            "1. Mencoba login:",
-            email
-          );
+        }, 800);
 
 
-          const userCredential =
-            await signInWithEmailAndPassword(
-              auth,
-              email,
-              password
-            );
+      } catch (error) {
+
+        console.error(error);
+
+        let message = "Login gagal.";
+
+        switch (error.code) {
+
+          case "auth/invalid-credential":
+          case "auth/wrong-password":
+          case "auth/user-not-found":
+
+            message =
+              "Email atau password salah.";
+
+            break;
 
 
-          const user =
-            userCredential.user;
+          case "auth/invalid-api-key":
+
+            message =
+              "Firebase API key tidak valid. Pastikan firebase.js memakai konfigurasi project kerjacuan-374dd.";
+
+            break;
 
 
-          console.log(
-            "2. AUTH BERHASIL"
-          );
+          case "auth/operation-not-allowed":
 
-          console.log(
-            "UID:",
-            user.uid
-          );
+            message =
+              "Login Email/Password belum diaktifkan di Firebase Authentication.";
 
-          console.log(
-            "Email:",
-            user.email
-          );
+            break;
 
 
-          // ===================================
-          // AMBIL DATA USER FIRESTORE
-          // ===================================
+          case "auth/too-many-requests":
 
-          console.log(
-            "3. Mencari users/" +
-            user.uid
-          );
+            message =
+              "Terlalu banyak percobaan login. Coba lagi beberapa saat.";
+
+            break;
 
 
-          const userRef =
-            doc(
-              db,
-              "users",
-              user.uid
-            );
+          case "auth/network-request-failed":
+
+            message =
+              "Koneksi internet bermasalah.";
+
+            break;
 
 
-          const userSnap =
-            await getDoc(userRef);
+          default:
 
-
-          console.log(
-            "4. FIRESTORE BERHASIL"
-          );
-
-
-          // ===================================
-          // CEK DOKUMEN
-          // ===================================
-
-          if (!userSnap.exists()) {
-
-            showMessage(
-              "Login berhasil, tetapi data pengguna belum ditemukan.",
-              "error"
-            );
-
-            console.error(
-              "Dokumen tidak ditemukan:",
-              "users/" + user.uid
-            );
-
-            return;
-          }
-
-
-          // ===================================
-          // DATA USER
-          // ===================================
-
-          const userData =
-            userSnap.data();
-
-
-          console.log(
-            "5. DATA USER:",
-            userData
-          );
-
-
-          const role =
-            userData.role || "user";
-
-
-          // ===================================
-          // ADMIN
-          // ===================================
-
-          if (role === "admin") {
-
-            showMessage(
-              "Login admin berhasil! Mengarahkan...",
-              "success"
-            );
-
-
-            setTimeout(
-              function() {
-
-                window.location.href =
-                  "admin.html";
-
-              },
-              800
-            );
-
-
-            return;
-          }
-
-
-          // ===================================
-          // USER BIASA
-          // ===================================
-
-          showMessage(
-            "Login berhasil! Mengarahkan...",
-            "success"
-          );
-
-
-          setTimeout(
-            function() {
-
-              window.location.href =
-                "index.html";
-
-            },
-            800
-          );
-
+            message =
+              error.message || "Terjadi kesalahan saat login.";
         }
 
 
-        // =====================================
-        // ERROR
-        // =====================================
+        showError(message);
 
-        catch (error) {
-
-          console.error(
-            "LOGIN ERROR:",
-            error
-          );
-
-
-          const errorMessage =
-            getErrorMessage(error);
-
-
-          showMessage(
-            errorMessage,
-            "error"
-          );
-
-        }
-
-
-        // =====================================
-        // ENABLE BUTTON
-        // =====================================
-
-        loginButton.disabled =
-          false;
-
-        loginButton.textContent =
-          "Login";
-
-        loginButton.classList.remove(
-          "loading"
-        );
+        loginButton.disabled = false;
+        loginButton.textContent = "Login";
 
       }
-    );
+
+    });
 
   </script>
 
