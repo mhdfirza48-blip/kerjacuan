@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Daftar - KerjaCuan</title>
+
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+
+      margin: 0;
+
+      min-height: 100vh;
+
+      font-family: Arial, sans-serif;
+
+      background: #0d1528;
+
+      color: white;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      padding: 20px;
+    }
+
+
+    .container {
+
+      width: 100%;
+
+      max-width: 620px;
+
+      background: #1e2a40;
+
+      border-radius: 28px;
+
+      padding: 45px 50px;
+
+      box-shadow:
+        0 20px 50px rgba(0,0,0,.3);
+    }
+
+
+    .logo {
+
+      text-align: center;
+
+      font-size: 48px;
+
+      font-weight: bold;
+
+      color: #20d05a;
+
+      margin-bottom: 8px;
+    }
+
+
+    .subtitle {
+
+      text-align: center;
+
+      color: #aebbd0;
+
+      font-size: 25px;
+
+      margin-bottom: 40px;
+    }
+
+
+    label {
+
+      display: block;
+
+      font-size: 20px;
+
+      margin-bottom: 10px;
+    }
+
+
+    input {
+
+      width: 100%;
+
+      height: 65px;
+
+      padding: 0 20px;
+
+      border-radius: 15px;
+
+      border: 1px solid #45536b;
+
+      outline: none;
+
+      background: #0d162b;
+
+      color: white;
+
+      font-size: 19px;
+
+      margin-bottom: 23px;
+    }
+
+
+    input:focus {
+
+      border-color: #20d05a;
+    }
+
+
+    button {
+
+      width: 100%;
+
+      height: 65px;
+
+      border: none;
+
+      border-radius: 15px;
+
+      background: #20c85a;
+
+      color: white;
+
+      font-size: 21px;
+
+      font-weight: bold;
+
+      cursor: pointer;
+    }
+
+
+    button:disabled {
+
+      opacity: .6;
+    }
+
+
+    .error {
+
+      display: none;
+
+      margin-top: 20px;
+
+      padding: 18px;
+
+      background: #8e1d20;
+
+      border-radius: 12px;
+
+      line-height: 1.5;
+    }
+
+
+    .success {
+
+      display: none;
+
+      margin-top: 20px;
+
+      padding: 18px;
+
+      background: #146c36;
+
+      border-radius: 12px;
+    }
+
+
+    .login {
+
+      text-align: center;
+
+      margin-top: 30px;
+
+      color: #aebbd0;
+
+      font-size: 19px;
+    }
+
+
+    .login a {
+
+      color: #20d05a;
+
+      text-decoration: none;
+
+      font-weight: bold;
+    }
+
+
+    @media (max-width: 600px) {
+
+      .container {
+
+        padding: 35px 25px;
+      }
+
+      .logo {
+
+        font-size: 40px;
+      }
+
+      .subtitle {
+
+        font-size: 21px;
+      }
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+  <div class="container">
+
+    <div class="logo">
+      KerjaCuan
+    </div>
+
+    <div class="subtitle">
+      Buat akun baru
+    </div>
+
+
+    <form id="registerForm">
+
+
+      <label for="name">
+        Nama
+      </label>
+
+      <input
+        id="name"
+        type="text"
+        placeholder="Nama kamu"
+        required
+      >
+
+
+      <label for="email">
+        Email
+      </label>
+
+      <input
+        id="email"
+        type="email"
+        placeholder="Email kamu"
+        required
+      >
+
+
+      <label for="password">
+        Password
+      </label>
+
+      <input
+        id="password"
+        type="password"
+        placeholder="Minimal 6 karakter"
+        minlength="6"
+        required
+      >
+
+
+      <label for="confirmPassword">
+        Ulangi Password
+      </label>
+
+      <input
+        id="confirmPassword"
+        type="password"
+        placeholder="Ulangi password"
+        minlength="6"
+        required
+      >
+
+
+      <button
+        id="registerButton"
+        type="submit"
+      >
+        Daftar
+      </button>
+
+
+    </form>
+
+
+    <div
+      id="errorBox"
+      class="error"
+    ></div>
+
+
+    <div
+      id="successBox"
+      class="success"
+    >
+      Akun berhasil dibuat. Mengarahkan ke halaman login...
+    </div>
+
+
+    <div class="login">
+
+      Sudah punya akun?
+
+      <a href="login.html">
+        Login
+      </a>
+
+    </div>
+
+
+  </div>
+
+
+  <script type="module">
+
+    import {
+
+      auth,
+
+      db,
+
+      createUserWithEmailAndPassword,
+
+      doc,
+
+      setDoc,
+
+      serverTimestamp
+
+    } from "./firebase.js";
+
+
+    const form =
+      document.getElementById("registerForm");
+
+
+    const nameInput =
+      document.getElementById("name");
+
+
+    const emailInput =
+      document.getElementById("email");
+
+
+    const passwordInput =
+      document.getElementById("password");
+
+
+    const confirmPasswordInput =
+      document.getElementById("confirmPassword");
+
+
+    const registerButton =
+      document.getElementById("registerButton");
+
+
+    const errorBox =
+      document.getElementById("errorBox");
+
+
+    const successBox =
+      document.getElementById("successBox");
+
+
+    function showError(message) {
+
+      errorBox.style.display = "block";
+
+      errorBox.textContent = message;
+
+      successBox.style.display = "none";
+    }
+
+
+    function showSuccess() {
+
+      errorBox.style.display = "none";
+
+      successBox.style.display = "block";
+    }
+
+
+    form.addEventListener(
+      "submit",
+      async function(event) {
+
+        event.preventDefault();
+
+
+        const name =
+          nameInput.value.trim();
+
+
+        const email =
+          emailInput.value.trim();
+
+
+        const password =
+          passwordInput.value;
+
+
+        const confirmPassword =
+          confirmPasswordInput.value;
+
+
+        if (password !== confirmPassword) {
+
+          showError(
+            "Password dan ulangi password tidak sama."
+          );
+
+          return;
+        }
+
+
+        if (password.length < 6) {
+
+          showError(
+            "Password minimal 6 karakter."
+          );
+
+          return;
+        }
+
+
+        registerButton.disabled = true;
+
+        registerButton.textContent =
+          "Membuat akun...";
+
+
+        try {
+
+
+          const userCredential =
+            await createUserWithEmailAndPassword(
+              auth,
+              email,
+              password
+            );
+
+
+          const user =
+            userCredential.user;
+
+
+          await setDoc(
+            doc(db, "users", user.uid),
+            {
+
+              name: name,
+
+              email: email,
+
+              role: "user",
+
+              balance: 0,
+
+              createdAt: serverTimestamp()
+
+            }
+          );
+
+
+          showSuccess();
+
+
+          setTimeout(() => {
+
+            window.location.href =
+              "login.html";
+
+          }, 1200);
+
+
+        } catch (error) {
+
+          console.error(error);
+
+
+          let message =
+            "Pendaftaran gagal.";
+
+
+          switch (error.code) {
+
+
+            case "auth/email-already-in-use":
+
+              message =
+                "Email tersebut sudah terdaftar.";
+
+              break;
+
+
+            case "auth/invalid-email":
+
+              message =
+                "Format email tidak valid.";
+
+              break;
+
+
+            case "auth/weak-password":
+
+              message =
+                "Password terlalu lemah. Gunakan minimal 6 karakter.";
+
+              break;
+
+
+            case "auth/operation-not-allowed":
+
+              message =
+                "Login Email/Password belum diaktifkan di Firebase Authentication.";
+
+              break;
+
+
+            case "auth/invalid-api-key":
+
+              message =
+                "Firebase API key tidak valid.";
+
+              break;
+
+
+            case "auth/network-request-failed":
+
+              message =
+                "Koneksi internet bermasalah.";
+
+              break;
+
+
+            default:
+
+              message =
+                error.message ||
+                "Terjadi kesalahan.";
+          }
+
+
+          showError(message);
+
+
+          registerButton.disabled =
+            false;
+
+          registerButton.textContent =
+            "Daftar";
+
+        }
+
+      }
+    );
+
+  </script>
+
+
+</body>
+</html>
